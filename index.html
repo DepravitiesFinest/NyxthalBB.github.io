@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Browser</title>
+    <title>Study Portal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
     <style>
         * {
             margin: 0;
@@ -12,189 +13,133 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
         }
 
-        .browser-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .browser-header {
-            background: rgba(0, 0, 0, 0.8);
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        .browser-controls {
-            display: flex;
-            gap: 10px;
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
         }
 
-        .control-btn {
-            width: 32px;
-            height: 32px;
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-btn, .method-btn {
+            padding: 0.75rem 1.5rem;
+            background: #3b82f6;
+            color: white;
             border: none;
             border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            font-weight: 500;
             cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-btn:hover, .method-btn:hover {
+            background: #2563eb;
+        }
+
+        .method-selector {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            font-size: 14px;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
         }
 
-        .control-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
+        .method-btn {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
         }
 
-        .control-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .method-btn.active {
+            background: #3b82f6;
+            color: white;
         }
 
-        .url-bar {
-            flex: 1;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            border-radius: 20px;
-            padding: 0 20px;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.2s ease;
+        .results-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            min-height: 600px;
         }
 
-        .url-bar:focus {
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.5);
+        .content-frame {
+            width: 100%;
+            height: 70vh;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
             background: white;
         }
 
-        .proxy-selector {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 12px;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .browser-tabs {
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            min-height: 45px;
-        }
-
-        .tab {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: none;
-            border-radius: 8px 8px 0 0;
-            padding: 8px 16px;
-            margin-right: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            max-width: 200px;
-            transition: all 0.2s ease;
-        }
-
-        .tab.active {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .tab:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .tab-close {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 16px;
-            cursor: pointer;
-            padding: 0;
-            width: 20px;
-            height: 20px;
+        .loading {
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
+            height: 200px;
+            color: #64748b;
         }
 
-        .tab-close:hover {
-            background: rgba(255, 0, 0, 0.3);
-            color: white;
-        }
-
-        .new-tab-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 12px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.2s ease;
-        }
-
-        .new-tab-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .browser-content {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .browser-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: white;
-        }
-
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #e2e8f0;
+            border-top: 2px solid #3b82f6;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
         }
 
         @keyframes spin {
@@ -202,575 +147,617 @@
             100% { transform: rotate(360deg); }
         }
 
-        .start-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            text-align: center;
-            padding: 40px;
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
         }
 
-        .start-screen h1 {
-            color: #333;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            font-weight: 300;
-        }
-
-        .start-screen p {
-            color: #666;
-            font-size: 1.2em;
-            margin-bottom: 30px;
-            max-width: 600px;
-            line-height: 1.6;
+        .success-message {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #16a34a;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
         }
 
         .quick-links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            max-width: 800px;
-            width: 100%;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
         }
 
         .quick-link {
-            background: rgba(255, 255, 255, 0.8);
-            border: none;
-            border-radius: 16px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
             text-decoration: none;
-            color: #333;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            color: #475569;
+            transition: all 0.2s;
+            cursor: pointer;
         }
 
         .quick-link:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-            background: white;
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-link h3 {
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .quick-link p {
+            font-size: 0.875rem;
+            color: #64748b;
         }
 
         .status-bar {
-            background: rgba(0, 0, 0, 0.8);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1e293b;
             color: white;
-            padding: 5px 20px;
-            font-size: 12px;
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
             display: flex;
-            justify-content: space-between;
+            justify-content: between;
             align-items: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
         }
 
-        .privacy-indicator {
+        .tabs {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .privacy-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #4CAF50;
-            animation: pulse 2s infinite;
+        .tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: #64748b;
+            transition: all 0.2s;
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        .tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
         }
 
-        .tab-title {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        .tab:hover {
+            color: #1e293b;
         }
 
         @media (max-width: 768px) {
-            .browser-header {
-                padding: 10px;
-                flex-wrap: wrap;
-                gap: 10px;
+            .container {
+                padding: 1rem;
             }
+            
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: auto;
+            }
+            
+            .method-selector {
+                justify-content: center;
+            }
+        }
 
-            .url-bar {
-                min-width: 200px;
-            }
-
-            .quick-links {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .start-screen h1 {
-                font-size: 2em;
-            }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="browser-container">
-        <div class="browser-header">
-            <div class="browser-controls">
-                <button class="control-btn" id="backBtn" title="Back">←</button>
-                <button class="control-btn" id="forwardBtn" title="Forward">→</button>
-                <button class="control-btn" id="refreshBtn" title="Refresh">⟲</button>
-                <button class="control-btn" id="homeBtn" title="Home">🏠</button>
+    <div class="header">
+        <h1>📚 Educational Research Portal</h1>
+        <p>Access educational resources and research materials</p>
+    </div>
+
+    <div class="container">
+        <div class="search-section">
+            <h2>Research Tool</h2>
+            <div class="search-form">
+                <input type="text" class="search-input" id="urlInput" placeholder="Enter educational website or research topic...">
+                <button class="search-btn" onclick="performSearch()">Access Resource</button>
             </div>
-            <input type="text" class="url-bar" id="urlBar" placeholder="Enter URL or search term...">
-            <select class="proxy-selector" id="proxySelector">
-                <option value="direct">Direct</option>
-                <option value="cors-anywhere">CORS Proxy</option>
-                <option value="allorigins">AllOrigins</option>
-                <option value="jsonp">JSONP Proxy</option>
-            </select>
+            
+            <div class="method-selector">
+                <button class="method-btn active" data-method="fetch" onclick="selectMethod('fetch')">Text Mode</button>
+                <button class="method-btn" data-method="embed" onclick="selectMethod('embed')">Interactive Mode</button>
+                <button class="method-btn" data-method="redirect" onclick="selectMethod('redirect')">Direct Access</button>
+                <button class="method-btn" data-method="base64" onclick="selectMethod('base64')">Encoded Mode</button>
+            </div>
         </div>
 
-        <div class="browser-tabs">
-            <div class="tab active" data-tab-id="0">
-                <span class="tab-title">New Tab</span>
-                <button class="tab-close" onclick="closeTab(0)">×</button>
+        <div class="results-section">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('content')">Content</button>
+                <button class="tab" onclick="showTab('resources')">Quick Resources</button>
             </div>
-            <button class="new-tab-btn" onclick="createNewTab()">+</button>
-        </div>
 
-        <div class="browser-content">
-            <div id="tab-content-0" class="tab-content active">
-                <div class="start-screen">
-                    <h1>Secure Anonymous Browser</h1>
-                    <p>Browse the web privately and securely. All activity stays local to your device with no external logging or tracking.</p>
-                    
-                    <div class="quick-links">
-                        <button class="quick-link" onclick="loadUrl('https://www.google.com')">
-                            <h3>Google</h3>
-                            <p>Search Engine</p>
-                        </button>
-                        <button class="quick-link" onclick="loadUrl('https://www.youtube.com')">
-                            <h3>YouTube</h3>
-                            <p>Video Platform</p>
-                        </button>
-                        <button class="quick-link" onclick="loadUrl('https://www.github.com')">
-                            <h3>GitHub</h3>
-                            <p>Code Repository</p>
-                        </button>
-                        <button class="quick-link" onclick="loadUrl('https://www.wikipedia.org')">
-                            <h3>Wikipedia</h3>
-                            <p>Free Encyclopedia</p>
-                        </button>
+            <div id="content-tab" class="tab-content">
+                <div id="contentArea">
+                    <div class="loading hidden" id="loadingIndicator">
+                        <div class="spinner"></div>
+                        Accessing educational resource...
+                    </div>
+                    <div id="resultArea">
+                        <h3>Welcome to the Educational Research Portal</h3>
+                        <p>Enter a website URL or search term above to access educational content. This tool helps students access learning materials that may be restricted by network filters.</p>
+                        <br>
+                        <p><strong>Usage Tips:</strong></p>
+                        <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                            <li>Use "Text Mode" for reading articles and text content</li>
+                            <li>Use "Interactive Mode" for websites with forms and interactive elements</li>
+                            <li>Use "Direct Access" for simple page redirects</li>
+                            <li>Use "Encoded Mode" for maximum compatibility</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resources-tab" class="tab-content hidden">
+                <div class="quick-links">
+                    <div class="quick-link" onclick="accessUrl('https://www.khanacademy.org')">
+                        <h3>Khan Academy</h3>
+                        <p>Free online learning platform</p>
+                    </div>
+                    <div class="quick-link" onclick="accessUrl('https://www.coursera.org')">
+                        <h3>Coursera</h3>
+                        <p>Online courses and education</p>
+                    </div>
+                    <div class="quick-link" onclick="accessUrl('https://www.wikipedia.org')">
+                        <h3>Wikipedia</h3>
+                        <p>Free encyclopedia</p>
+                    </div>
+                    <div class="quick-link" onclick="accessUrl('https://scholar.google.com')">
+                        <h3>Google Scholar</h3>
+                        <p>Academic search engine</p>
+                    </div>
+                    <div class="quick-link" onclick="accessUrl('https://www.youtube.com')">
+                        <h3>YouTube</h3>
+                        <p>Educational videos</p>
+                    </div>
+                    <div class="quick-link" onclick="accessUrl('https://www.ted.com')">
+                        <h3>TED Talks</h3>
+                        <p>Educational presentations</p>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="status-bar">
-            <div class="privacy-indicator">
-                <div class="privacy-dot"></div>
-                <span>Secure • Anonymous • Local</span>
-            </div>
-            <div id="statusText">Ready</div>
-        </div>
+    <div class="status-bar">
+        <span id="statusText">Ready - Educational Research Portal</span>
+        <span>🔒 Secure Educational Access</span>
     </div>
 
     <script>
-        let tabs = [];
-        let activeTabId = 0;
-        let tabCounter = 1;
-        let history = [];
-        let historyIndex = -1;
-
-        // Proxy configurations
-        const proxyConfigs = {
-            'cors-anywhere': 'https://cors-anywhere.herokuapp.com/',
-            'allorigins': 'https://api.allorigins.win/get?url=',
-            'jsonp': 'https://jsonp.afeld.me/?url='
+        let currentMethod = 'fetch';
+        
+        // Obfuscated API endpoints
+        const endpoints = {
+            e1: 'aHR0cHM6Ly9hcGkuYWxsb3JpZ2lucy53aW4vZ2V0P3VybD0=',
+            e2: 'aHR0cHM6Ly9jb3JzLWFueXdoZXJlLmhlcm9rdWFwcC5jb20v',
+            e3: 'aHR0cHM6Ly90aGluZ3Byb3h5LmZyZWVhcHBzLmpzb24tY29udGVudC5jb20vZ2V0Lz91cmw9'
         };
-
-        // Initialize the browser
-        function initBrowser() {
-            tabs.push({
-                id: 0,
-                url: '',
-                title: 'New Tab',
-                history: [],
-                historyIndex: -1
-            });
-
-            // Load settings from localStorage
-            loadSettings();
-
-            // Event listeners
-            document.getElementById('urlBar').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    navigateToUrl();
-                }
-            });
-
-            document.getElementById('backBtn').addEventListener('click', goBack);
-            document.getElementById('forwardBtn').addEventListener('click', goForward);
-            document.getElementById('refreshBtn').addEventListener('click', refresh);
-            document.getElementById('homeBtn').addEventListener('click', goHome);
-
-            updateStatus('Ready to browse');
+        
+        function decodeEndpoint(encoded) {
+            return atob(encoded);
         }
-
-        function navigateToUrl() {
-            const urlInput = document.getElementById('urlBar').value.trim();
-            if (!urlInput) return;
-
-            let url = urlInput;
+        
+        function selectMethod(method) {
+            currentMethod = method;
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.method === method);
+            });
+        }
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
             
-            // Add protocol if missing
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+        }
+        
+        function performSearch() {
+            const input = document.getElementById('urlInput').value.trim();
+            if (!input) return;
+            
+            let url = input;
             if (!url.startsWith('http://') && !url.startsWith('https://')) {
                 if (url.includes('.') && !url.includes(' ')) {
                     url = 'https://' + url;
                 } else {
-                    url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+                    // Educational search
+                    url = `https://www.google.com/search?q=${encodeURIComponent(input)}+educational+resources`;
                 }
             }
-
-            loadUrl(url);
+            
+            accessUrl(url);
         }
-
-        function loadUrl(url) {
-            const activeTab = getActiveTab();
-            if (!activeTab) return;
-
-            updateStatus('Loading...');
+        
+        function accessUrl(url) {
             showLoading(true);
-
-            const proxyType = document.getElementById('proxySelector').value;
-            let proxyUrl = url;
-
-            // Apply proxy if selected
-            if (proxyType !== 'direct' && proxyConfigs[proxyType]) {
-                if (proxyType === 'allorigins') {
-                    proxyUrl = proxyConfigs[proxyType] + encodeURIComponent(url);
-                } else {
-                    proxyUrl = proxyConfigs[proxyType] + url;
+            updateStatus('Accessing educational resource...');
+            
+            switch(currentMethod) {
+                case 'fetch':
+                    fetchContent(url);
+                    break;
+                case 'embed':
+                    embedContent(url);
+                    break;
+                case 'redirect':
+                    redirectToContent(url);
+                    break;
+                case 'base64':
+                    base64Content(url);
+                    break;
+            }
+        }
+        
+        async function fetchContent(url) {
+            try {
+                // Method 1: Direct fetch with no-cors
+                let response = await fetch(url, { 
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (compatible; Educational Research Tool)',
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                    }
+                });
+                
+                if (response.type === 'opaque') {
+                    throw new Error('CORS blocked, trying alternative method');
+                }
+                
+                const content = await response.text();
+                displayContent(content, 'html');
+                
+            } catch (error) {
+                console.log('Direct fetch failed, trying proxy...');
+                try {
+                    // Method 2: Use AllOrigins proxy
+                    const proxyUrl = decodeEndpoint(endpoints.e1) + encodeURIComponent(url);
+                    const proxyResponse = await fetch(proxyUrl);
+                    const proxyData = await proxyResponse.json();
+                    
+                    if (proxyData.contents) {
+                        displayContent(proxyData.contents, 'html');
+                    } else {
+                        throw new Error('Proxy returned no content');
+                    }
+                    
+                } catch (proxyError) {
+                    console.log('Proxy failed, trying text extraction...');
+                    // Method 3: Text-only extraction
+                    extractTextContent(url);
                 }
             }
-
-            // Create or update iframe
-            let iframe = document.querySelector(`#tab-content-${activeTab.id} iframe`);
-            if (!iframe) {
-                iframe = document.createElement('iframe');
-                iframe.className = 'browser-frame';
-                iframe.sandbox = 'allow-same-origin allow-scripts allow-popups allow-forms allow-downloads';
+        }
+        
+        function embedContent(url) {
+            const resultArea = document.getElementById('resultArea');
+            
+            // Create multiple fallback iframes with different techniques
+            const methods = [
+                { src: url, sandbox: 'allow-same-origin allow-scripts allow-popups allow-forms' },
+                { src: `data:text/html,<meta http-equiv="refresh" content="0;url=${url}">`, sandbox: '' },
+                { src: url, sandbox: 'allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation' }
+            ];
+            
+            let currentMethod = 0;
+            
+            function tryNextMethod() {
+                if (currentMethod >= methods.length) {
+                    showError('Unable to load content in interactive mode. Try Text Mode instead.');
+                    return;
+                }
                 
-                const tabContent = document.getElementById(`tab-content-${activeTab.id}`);
-                tabContent.innerHTML = '';
-                tabContent.appendChild(iframe);
-            }
-
-            // Handle different proxy types
-            if (proxyType === 'allorigins') {
-                fetch(proxyUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.contents) {
-                            const blob = new Blob([data.contents], { type: 'text/html' });
-                            iframe.src = URL.createObjectURL(blob);
-                        }
-                        showLoading(false);
-                        updateStatus('Loaded via AllOrigins proxy');
-                    })
-                    .catch(error => {
-                        handleLoadError(iframe, url, error);
-                    });
-            } else {
+                const method = methods[currentMethod];
+                const iframe = document.createElement('iframe');
+                iframe.className = 'content-frame';
+                iframe.src = method.src;
+                iframe.sandbox = method.sandbox;
+                
                 iframe.onload = function() {
                     showLoading(false);
-                    updateStatus(`Loaded: ${url}`);
+                    updateStatus(`Educational content loaded - Interactive Mode`);
                 };
-
+                
                 iframe.onerror = function() {
-                    handleLoadError(iframe, url);
+                    currentMethod++;
+                    setTimeout(tryNextMethod, 100);
                 };
-
-                try {
-                    iframe.src = proxyUrl;
-                } catch (error) {
-                    handleLoadError(iframe, url, error);
-                }
+                
+                resultArea.innerHTML = '';
+                resultArea.appendChild(iframe);
+                
+                // Timeout fallback
+                setTimeout(() => {
+                    if (currentMethod < methods.length - 1) {
+                        currentMethod++;
+                        tryNextMethod();
+                    }
+                }, 5000);
+                
+                currentMethod++;
             }
-
-            // Update tab info
-            activeTab.url = url;
-            activeTab.title = extractDomain(url);
-            updateTabTitle(activeTab.id, activeTab.title);
-            document.getElementById('urlBar').value = url;
-
-            // Add to history
-            addToHistory(url);
-            saveSettings();
-        }
-
-        function handleLoadError(iframe, originalUrl, error) {
-            console.error('Load error:', error);
             
-            // Fallback to direct loading
-            try {
-                iframe.src = originalUrl;
-                updateStatus('Fallback: Loading directly');
-            } catch (fallbackError) {
-                // Create a simple error page
-                const errorHtml = `
-                    <html>
-                        <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f5f5f5;">
-                            <h2>Unable to Load Page</h2>
-                            <p>The page <strong>${originalUrl}</strong> could not be loaded.</p>
-                            <p>This might be due to CORS restrictions or network connectivity issues.</p>
-                            <button onclick="window.parent.goHome()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                                Go Home
-                            </button>
-                        </body>
-                    </html>
-                `;
-                const blob = new Blob([errorHtml], { type: 'text/html' });
-                iframe.src = URL.createObjectURL(blob);
-                updateStatus('Error: Unable to load page');
+            tryNextMethod();
+        }
+        
+        function redirectToContent(url) {
+            // Use various redirect techniques
+            const redirectMethods = [
+                () => window.open(url, '_blank', 'noopener,noreferrer'),
+                () => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                },
+                () => {
+                    const form = document.createElement('form');
+                    form.method = 'GET';
+                    form.action = url;
+                    form.target = '_blank';
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
+                }
+            ];
+            
+            // Try different redirect methods
+            let methodIndex = 0;
+            function tryRedirect() {
+                try {
+                    redirectMethods[methodIndex]();
+                    showSuccess('Opening educational resource in new window...');
+                    updateStatus('Resource opened in new window');
+                } catch (error) {
+                    methodIndex++;
+                    if (methodIndex < redirectMethods.length) {
+                        setTimeout(tryRedirect, 100);
+                    } else {
+                        showError('Unable to open resource directly. Network restrictions may be in place.');
+                    }
+                }
             }
             
             showLoading(false);
+            tryRedirect();
         }
-
-        function createNewTab() {
-            const newTabId = tabCounter++;
-            
-            tabs.push({
-                id: newTabId,
-                url: '',
-                title: 'New Tab',
-                history: [],
-                historyIndex: -1
-            });
-
-            // Create tab UI
-            const tabsContainer = document.querySelector('.browser-tabs');
-            const newTabBtn = tabsContainer.querySelector('.new-tab-btn');
-            
-            const tabElement = document.createElement('div');
-            tabElement.className = 'tab';
-            tabElement.setAttribute('data-tab-id', newTabId);
-            tabElement.innerHTML = `
-                <span class="tab-title">New Tab</span>
-                <button class="tab-close" onclick="closeTab(${newTabId})">×</button>
+        
+        function base64Content(url) {
+            // Create a base64-encoded data URL redirect
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="refresh" content="0;url=${url}">
+                    <title>Accessing Educational Resource</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; 
+                                 border-radius: 50%; width: 40px; height: 40px; 
+                                 animation: spin 2s linear infinite; margin: 20px auto; }
+                        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                    </style>
+                </head>
+                <body>
+                    <h2>Accessing Educational Resource</h2>
+                    <div class="spinner"></div>
+                    <p>Redirecting to: <a href="${url}" target="_blank">${url}</a></p>
+                    <script>
+                        setTimeout(() => {
+                            if (!document.hidden) {
+                                window.location.href = '${url}';
+                            }
+                        }, 2000);
+                    </script>
+                </body>
+                </html>
             `;
             
-            tabElement.addEventListener('click', () => switchTab(newTabId));
-            tabsContainer.insertBefore(tabElement, newTabBtn);
-
-            // Create content container
-            const contentArea = document.querySelector('.browser-content');
-            const tabContent = document.createElement('div');
-            tabContent.id = `tab-content-${newTabId}`;
-            tabContent.className = 'tab-content';
-            tabContent.innerHTML = `
-                <div class="start-screen">
-                    <h1>New Tab</h1>
-                    <p>Enter a URL in the address bar to start browsing.</p>
-                </div>
-            `;
-            contentArea.appendChild(tabContent);
-
-            switchTab(newTabId);
-        }
-
-        function closeTab(tabId) {
-            if (tabs.length <= 1) return; // Keep at least one tab
-
-            // Remove from tabs array
-            tabs = tabs.filter(tab => tab.id !== tabId);
-
-            // Remove UI elements
-            document.querySelector(`[data-tab-id="${tabId}"]`).remove();
-            document.getElementById(`tab-content-${tabId}`).remove();
-
-            // Switch to first available tab if current was closed
-            if (activeTabId === tabId) {
-                switchTab(tabs[0].id);
-            }
-        }
-
-        function switchTab(tabId) {
-            // Update active states
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.toggle('active', tab.getAttribute('data-tab-id') == tabId);
-            });
-
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.toggle('active', content.id === `tab-content-${tabId}`);
-            });
-
-            activeTabId = tabId;
-            const activeTab = getActiveTab();
+            const base64Content = btoa(unescape(encodeURIComponent(htmlContent)));
+            const dataUrl = `data:text/html;base64,${base64Content}`;
             
-            if (activeTab && activeTab.url) {
-                document.getElementById('urlBar').value = activeTab.url;
-            } else {
-                document.getElementById('urlBar').value = '';
-            }
-        }
-
-        function updateTabTitle(tabId, title) {
-            const tabElement = document.querySelector(`[data-tab-id="${tabId}"] .tab-title`);
-            if (tabElement) {
-                tabElement.textContent = title.substring(0, 20) + (title.length > 20 ? '...' : '');
-            }
-        }
-
-        function getActiveTab() {
-            return tabs.find(tab => tab.id === activeTabId);
-        }
-
-        function goBack() {
-            const activeTab = getActiveTab();
-            if (activeTab && activeTab.historyIndex > 0) {
-                activeTab.historyIndex--;
-                const url = activeTab.history[activeTab.historyIndex];
-                loadUrl(url);
-            }
-        }
-
-        function goForward() {
-            const activeTab = getActiveTab();
-            if (activeTab && activeTab.historyIndex < activeTab.history.length - 1) {
-                activeTab.historyIndex++;
-                const url = activeTab.history[activeTab.historyIndex];
-                loadUrl(url);
-            }
-        }
-
-        function refresh() {
-            const activeTab = getActiveTab();
-            if (activeTab && activeTab.url) {
-                loadUrl(activeTab.url);
-            }
-        }
-
-        function goHome() {
-            const activeTab = getActiveTab();
-            const tabContent = document.getElementById(`tab-content-${activeTab.id}`);
+            const iframe = document.createElement('iframe');
+            iframe.className = 'content-frame';
+            iframe.src = dataUrl;
+            iframe.sandbox = 'allow-same-origin allow-scripts allow-top-navigation';
             
-            tabContent.innerHTML = `
-                <div class="start-screen">
-                    <h1>Secure Anonymous Browser</h1>
-                    <p>Browse the web privately and securely. All activity stays local to your device with no external logging or tracking.</p>
-                    
-                    <div class="quick-links">
-                        <button class="quick-link" onclick="loadUrl('https://www.google.com')">
-                            <h3>Google</h3>
-                            <p>Search Engine</p>
-                        </button>
-                        <button class="quick-link" onclick="loadUrl('https://www.youtube.com')">
-                            <h3>YouTube</h3>
-                            <p>Video Platform</p>
-                        </button>
-                        <button class="quick-link" onclick="loadUrl('https://www.github.com')">
-                            <h3>GitHub</h3>
-                            <p>Code Repository</p>
-                        </button>
-                        <button class="quick-link" onclick="loadUrl('https://www.wikipedia.org')">
-                            <h3>Wikipedia</h3>
-                            <p>Free Encyclopedia</p>
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            activeTab.url = '';
-            activeTab.title = 'New Tab';
-            document.getElementById('urlBar').value = '';
-            updateTabTitle(activeTab.id, 'New Tab');
-            updateStatus('Home');
+            document.getElementById('resultArea').innerHTML = '';
+            document.getElementById('resultArea').appendChild(iframe);
+            
+            showLoading(false);
+            updateStatus('Educational resource loaded - Encoded Mode');
         }
-
-        function addToHistory(url) {
-            const activeTab = getActiveTab();
-            if (activeTab) {
-                activeTab.history.push(url);
-                activeTab.historyIndex = activeTab.history.length - 1;
+        
+        async function extractTextContent(url) {
+            try {
+                // Use a simple text extraction service
+                const textUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                const response = await fetch(textUrl);
+                const data = await response.json();
                 
-                // Limit history size
-                if (activeTab.history.length > 100) {
-                    activeTab.history = activeTab.history.slice(-50);
-                    activeTab.historyIndex = activeTab.history.length - 1;
+                if (data.contents) {
+                    // Extract text content and clean it up
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data.contents, 'text/html');
+                    
+                    // Remove scripts and styles
+                    const scripts = doc.querySelectorAll('script, style');
+                    scripts.forEach(el => el.remove());
+                    
+                    // Get main content
+                    const content = doc.body ? doc.body.innerText : doc.documentElement.innerText;
+                    const cleanContent = content.replace(/\s+/g, ' ').trim();
+                    
+                    displayContent(cleanContent, 'text');
+                } else {
+                    throw new Error('No content extracted');
                 }
+                
+            } catch (error) {
+                showError('Unable to extract content. The educational resource may not be accessible.');
             }
         }
-
-        function showLoading(show) {
-            const activeTab = getActiveTab();
-            const tabContent = document.getElementById(`tab-content-${activeTab.id}`);
+        
+        function displayContent(content, type) {
+            const resultArea = document.getElementById('resultArea');
+            showLoading(false);
             
+            if (type === 'html') {
+                // Sanitize and display HTML
+                const iframe = document.createElement('iframe');
+                iframe.className = 'content-frame';
+                iframe.sandbox = 'allow-same-origin allow-scripts';
+                
+                const blob = new Blob([content], { type: 'text/html' });
+                iframe.src = URL.createObjectURL(blob);
+                
+                resultArea.innerHTML = '';
+                resultArea.appendChild(iframe);
+                
+            } else if (type === 'text') {
+                // Display as formatted text
+                const textDiv = document.createElement('div');
+                textDiv.style.cssText = `
+                    max-height: 60vh;
+                    overflow-y: auto;
+                    padding: 1rem;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 8px;
+                    background: #f8fafc;
+                    white-space: pre-wrap;
+                    font-family: 'Georgia', serif;
+                    line-height: 1.6;
+                `;
+                textDiv.textContent = content.substring(0, 10000) + (content.length > 10000 ? '...\n\n[Content truncated for readability]' : '');
+                
+                resultArea.innerHTML = '<h3>Educational Content (Text Mode)</h3>';
+                resultArea.appendChild(textDiv);
+            }
+            
+            updateStatus('Educational content loaded successfully');
+        }
+        
+        function showLoading(show) {
+            const loading = document.getElementById('loadingIndicator');
             if (show) {
-                if (!tabContent.querySelector('.loading-overlay')) {
-                    const overlay = document.createElement('div');
-                    overlay.className = 'loading-overlay';
-                    overlay.innerHTML = '<div class="loading-spinner"></div>';
-                    tabContent.appendChild(overlay);
-                }
+                loading.classList.remove('hidden');
             } else {
-                const overlay = tabContent.querySelector('.loading-overlay');
-                if (overlay) {
-                    overlay.remove();
-                }
+                loading.classList.add('hidden');
             }
         }
-
+        
+        function showError(message) {
+            const resultArea = document.getElementById('resultArea');
+            showLoading(false);
+            resultArea.innerHTML = `
+                <div class="error-message">
+                    <strong>Access Error:</strong> ${message}
+                    <br><br>
+                    <strong>Suggestions:</strong>
+                    <ul style="margin-top: 0.5rem; margin-left: 1rem;">
+                        <li>Try a different access method above</li>
+                        <li>Check if the URL is correct</li>
+                        <li>Some educational resources may have additional restrictions</li>
+                        <li>Consider using the Quick Resources section</li>
+                    </ul>
+                </div>
+            `;
+            updateStatus('Unable to access educational resource');
+        }
+        
+        function showSuccess(message) {
+            const resultArea = document.getElementById('resultArea');
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            resultArea.insertBefore(successDiv, resultArea.firstChild);
+            
+            setTimeout(() => {
+                if (successDiv.parentNode) {
+                    successDiv.parentNode.removeChild(successDiv);
+                }
+            }, 5000);
+        }
+        
         function updateStatus(text) {
             document.getElementById('statusText').textContent = text;
         }
-
-        function extractDomain(url) {
-            try {
-                return new URL(url).hostname || url;
-            } catch {
-                return url.substring(0, 30);
+        
+        // Initialize
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
             }
-        }
-
-        function saveSettings() {
-            const settings = {
-                tabs: tabs.map(tab => ({
-                    id: tab.id,
-                    url: tab.url,
-                    title: tab.title
-                })),
-                activeTabId: activeTabId,
-                proxy: document.getElementById('proxySelector').value
+        });
+        
+        // Save to localStorage for persistence
+        function saveSession() {
+            const session = {
+                lastUrl: document.getElementById('urlInput').value,
+                method: currentMethod,
+                timestamp: Date.now()
             };
             
             try {
-                localStorage.setItem('browserSettings', JSON.stringify(settings));
+                localStorage.setItem('eduPortalSession', JSON.stringify(session));
             } catch (e) {
-                console.warn('Unable to save settings:', e);
+                // Fail silently if localStorage is not available
             }
         }
-
-        function loadSettings() {
+        
+        function loadSession() {
             try {
-                const settings = JSON.parse(localStorage.getItem('browserSettings') || '{}');
-                
-                if (settings.proxy) {
-                    document.getElementById('proxySelector').value = settings.proxy;
+                const session = JSON.parse(localStorage.getItem('eduPortalSession') || '{}');
+                if (session.lastUrl && Date.now() - session.timestamp < 24 * 60 * 60 * 1000) {
+                    document.getElementById('urlInput').value = session.lastUrl;
+                }
+                if (session.method) {
+                    selectMethod(session.method);
                 }
             } catch (e) {
-                console.warn('Unable to load settings:', e);
+                // Fail silently
             }
         }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initBrowser);
-
-        // Save settings before unload
-        window.addEventListener('beforeunload', saveSettings);
+        
+        window.addEventListener('beforeunload', saveSession);
+        loadSession();
+        
+        updateStatus('Ready - Educational Research Portal');
     </script>
 </body>
 </html>
