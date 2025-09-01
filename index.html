@@ -13,907 +13,764 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #1a1a1a;
-            color: #ffffff;
-            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             overflow: hidden;
         }
 
-        .browser {
-            height: 100vh;
+        .browser-container {
             display: flex;
             flex-direction: column;
-            background: #2d2d2d;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .tabs-container {
-            background: #1e1e1e;
-            border-bottom: 1px solid #404040;
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            min-height: 40px;
-        }
-
-        .tabs {
-            display: flex;
-            flex: 1;
-            overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .tabs::-webkit-scrollbar {
-            display: none;
-        }
-
-        .tab {
-            background: #2d2d2d;
-            border: 1px solid #404040;
-            border-bottom: none;
-            border-radius: 8px 8px 0 0;
-            padding: 8px 16px;
-            min-width: 200px;
-            max-width: 240px;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            margin-right: 2px;
-        }
-
-        .tab:hover {
-            background: #383838;
-        }
-
-        .tab.active {
-            background: #404040;
-            border-color: #606060;
-        }
-
-        .tab-favicon {
-            width: 16px;
-            height: 16px;
-            margin-right: 8px;
-            border-radius: 2px;
-            background: #666;
-            flex-shrink: 0;
-        }
-
-        .tab-title {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 13px;
-            color: #ccc;
-        }
-
-        .tab.active .tab-title {
-            color: #fff;
-        }
-
-        .tab-close {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: transparent;
-            border: none;
-            color: #999;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            margin-left: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .tab-close:hover {
-            background: #ff5f5f;
+        .browser-header {
+            background: rgba(0, 0, 0, 0.8);
             color: white;
-        }
-
-        .new-tab-btn {
-            background: transparent;
-            border: none;
-            color: #ccc;
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
+            padding: 10px 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s ease;
-            margin-left: 8px;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .new-tab-btn:hover {
-            background: #404040;
-            color: #fff;
-        }
-
-        .toolbar {
-            background: #2d2d2d;
-            padding: 12px 16px;
+        .browser-controls {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid #404040;
-        }
-
-        .nav-controls {
-            display: flex;
-            gap: 4px;
-        }
-
-        .nav-btn {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: transparent;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ccc;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-
-        .nav-btn:hover:not(:disabled) {
-            background: #404040;
-            color: #fff;
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .address-bar {
-            flex: 1;
-            background: #1e1e1e;
-            border: 1px solid #404040;
-            border-radius: 20px;
-            padding: 8px 16px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        .address-bar:focus {
-            border-color: #0066cc;
-            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
-        }
-
-        .controls {
-            display: flex;
-            gap: 4px;
+            gap: 10px;
         }
 
         .control-btn {
             width: 32px;
             height: 32px;
             border: none;
-            background: transparent;
-            border-radius: 6px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ccc;
-            font-size: 14px;
             transition: all 0.2s ease;
+            font-size: 14px;
         }
 
         .control-btn:hover {
-            background: #404040;
-            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
         }
 
-        .content-area {
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .url-bar {
+            flex: 1;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 20px;
+            padding: 0 20px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .url-bar:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.5);
+            background: white;
+        }
+
+        .proxy-selector {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .browser-tabs {
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 45px;
+        }
+
+        .tab {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            padding: 8px 16px;
+            margin-right: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 200px;
+            transition: all 0.2s ease;
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .tab-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .tab-close:hover {
+            background: rgba(255, 0, 0, 0.3);
+            color: white;
+        }
+
+        .new-tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s ease;
+        }
+
+        .new-tab-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .browser-content {
             flex: 1;
             position: relative;
-            background: #1a1a1a;
+            overflow: hidden;
         }
 
-        .tab-content {
+        .browser-frame {
             width: 100%;
             height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .tab-content.active {
-            opacity: 1;
-        }
-
-        .content-frame {
-            width: 100%;
-            height: 100%;
-            background: #fff;
             border: none;
-            overflow: auto;
+            background: white;
         }
 
-        .loading-bar {
+        .loading-overlay {
             position: absolute;
             top: 0;
             left: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #0066cc, #0080ff);
-            width: 0%;
-            transition: width 0.3s ease;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 10;
         }
 
-        .start-page {
-            height: 100%;
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .start-screen {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
             text-align: center;
             padding: 40px;
         }
 
-        .start-page h1 {
-            font-size: 2.2em;
+        .start-screen h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 20px;
             font-weight: 300;
-            margin-bottom: 16px;
-            color: #fff;
         }
 
-        .start-page p {
-            font-size: 1em;
-            color: #aaa;
-            margin-bottom: 40px;
-            max-width: 500px;
-            line-height: 1.5;
-        }
-
-        .quick-access {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px;
+        .start-screen p {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
             max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 800px;
             width: 100%;
+            margin-top: 30px;
         }
 
         .quick-link {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 16px;
             padding: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
-            color: inherit;
+            color: #333;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .quick-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .quick-link-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .quick-link-title {
-            font-size: 14px;
-            font-weight: 500;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-
-        .quick-link-desc {
-            font-size: 12px;
-            color: #aaa;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            background: white;
         }
 
         .status-bar {
-            background: #1e1e1e;
-            border-top: 1px solid #404040;
-            padding: 6px 16px;
-            font-size: 11px;
-            color: #999;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 20px;
+            font-size: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: #2d2d2d;
-            border: 1px solid #404040;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            min-width: 200px;
-            z-index: 1000;
-            opacity: 0;
-            transform: translateY(-10px);
-            pointer-events: none;
-            transition: all 0.2s ease;
-        }
-
-        .dropdown.show {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        .dropdown-item {
-            padding: 10px 16px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            color: #ccc;
-            font-size: 13px;
-            border-bottom: 1px solid #404040;
-        }
-
-        .dropdown-item:hover {
-            background: #404040;
-            color: #fff;
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .error-page {
-            height: 100%;
+        .privacy-indicator {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            background: #1e1e1e;
-            text-align: center;
-            padding: 40px;
+            gap: 8px;
         }
 
-        .error-page h2 {
-            color: #ff6b6b;
-            margin-bottom: 16px;
+        .privacy-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
         }
 
-        .error-page p {
-            color: #aaa;
-            margin-bottom: 20px;
-            max-width: 500px;
-            line-height: 1.5;
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
-        .retry-btn {
-            background: #0066cc;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .retry-btn:hover {
-            background: #0052a3;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .tab-content.active {
-            animation: fadeIn 0.3s ease;
+        .tab-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         @media (max-width: 768px) {
-            .toolbar {
-                padding: 8px 12px;
-                gap: 8px;
+            .browser-header {
+                padding: 10px;
+                flex-wrap: wrap;
+                gap: 10px;
             }
-            
-            .tab {
-                min-width: 120px;
-                max-width: 160px;
-                padding: 6px 12px;
+
+            .url-bar {
+                min-width: 200px;
             }
-            
-            .quick-access {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+
+            .quick-links {
+                grid-template-columns: 1fr;
+                gap: 15px;
             }
-            
-            .start-page {
-                padding: 20px;
+
+            .start-screen h1 {
+                font-size: 2em;
             }
         }
     </style>
 </head>
 <body>
-    <div class="browser">
-        <div class="tabs-container">
-            <div class="tabs" id="tabs"></div>
-            <button class="new-tab-btn" id="newTabBtn" title="New Tab">+</button>
+    <div class="browser-container">
+        <div class="browser-header">
+            <div class="browser-controls">
+                <button class="control-btn" id="backBtn" title="Back">←</button>
+                <button class="control-btn" id="forwardBtn" title="Forward">→</button>
+                <button class="control-btn" id="refreshBtn" title="Refresh">⟲</button>
+                <button class="control-btn" id="homeBtn" title="Home">🏠</button>
+            </div>
+            <input type="text" class="url-bar" id="urlBar" placeholder="Enter URL or search term...">
+            <select class="proxy-selector" id="proxySelector">
+                <option value="direct">Direct</option>
+                <option value="cors-anywhere">CORS Proxy</option>
+                <option value="allorigins">AllOrigins</option>
+                <option value="jsonp">JSONP Proxy</option>
+            </select>
         </div>
 
-        <div class="toolbar">
-            <div class="nav-controls">
-                <button class="nav-btn" id="backBtn" title="Back">←</button>
-                <button class="nav-btn" id="forwardBtn" title="Forward">→</button>
-                <button class="nav-btn" id="refreshBtn" title="Refresh">↻</button>
+        <div class="browser-tabs">
+            <div class="tab active" data-tab-id="0">
+                <span class="tab-title">New Tab</span>
+                <button class="tab-close" onclick="closeTab(0)">×</button>
             </div>
-            
-            <input type="text" class="address-bar" id="addressBar" placeholder="Search or enter address">
-            
-            <div class="controls">
-                <div style="position: relative;">
-                    <button class="control-btn" id="menuBtn" title="Menu">⋮</button>
-                    <div class="dropdown" id="menuDropdown">
-                        <div class="dropdown-item" onclick="browser.newTab()">New Tab</div>
-                        <div class="dropdown-item" onclick="browser.clearData()">Clear Data</div>
-                        <div class="dropdown-item" onclick="browser.exportData()">Export Data</div>
+            <button class="new-tab-btn" onclick="createNewTab()">+</button>
+        </div>
+
+        <div class="browser-content">
+            <div id="tab-content-0" class="tab-content active">
+                <div class="start-screen">
+                    <h1>Secure Anonymous Browser</h1>
+                    <p>Browse the web privately and securely. All activity stays local to your device with no external logging or tracking.</p>
+                    
+                    <div class="quick-links">
+                        <button class="quick-link" onclick="loadUrl('https://www.google.com')">
+                            <h3>Google</h3>
+                            <p>Search Engine</p>
+                        </button>
+                        <button class="quick-link" onclick="loadUrl('https://www.youtube.com')">
+                            <h3>YouTube</h3>
+                            <p>Video Platform</p>
+                        </button>
+                        <button class="quick-link" onclick="loadUrl('https://www.github.com')">
+                            <h3>GitHub</h3>
+                            <p>Code Repository</p>
+                        </button>
+                        <button class="quick-link" onclick="loadUrl('https://www.wikipedia.org')">
+                            <h3>Wikipedia</h3>
+                            <p>Free Encyclopedia</p>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="content-area" id="contentArea"></div>
-
         <div class="status-bar">
-            <span id="statusText">Ready</span>
-            <span>Secure • Private • Local</span>
+            <div class="privacy-indicator">
+                <div class="privacy-dot"></div>
+                <span>Secure • Anonymous • Local</span>
+            </div>
+            <div id="statusText">Ready</div>
         </div>
     </div>
 
     <script>
-        class SecureBrowser {
-            constructor() {
-                this.tabs = [];
-                this.activeTabId = null;
-                this.tabCounter = 0;
-                this.proxies = [
-                    'https://api.allorigins.win/get?url=',
-                    'https://cors-anywhere.herokuapp.com/',
-                    'https://thingproxy.freeboard.io/fetch/'
-                ];
-                this.currentProxyIndex = 0;
-                
-                this.initializeElements();
-                this.bindEvents();
-                this.createTab();
-            }
+        let tabs = [];
+        let activeTabId = 0;
+        let tabCounter = 1;
+        let history = [];
+        let historyIndex = -1;
 
-            initializeElements() {
-                this.tabsContainer = document.getElementById('tabs');
-                this.contentArea = document.getElementById('contentArea');
-                this.addressBar = document.getElementById('addressBar');
-                this.backBtn = document.getElementById('backBtn');
-                this.forwardBtn = document.getElementById('forwardBtn');
-                this.refreshBtn = document.getElementById('refreshBtn');
-                this.newTabBtn = document.getElementById('newTabBtn');
-                this.menuBtn = document.getElementById('menuBtn');
-                this.menuDropdown = document.getElementById('menuDropdown');
-                this.statusText = document.getElementById('statusText');
-            }
+        // Proxy configurations
+        const proxyConfigs = {
+            'cors-anywhere': 'https://cors-anywhere.herokuapp.com/',
+            'allorigins': 'https://api.allorigins.win/get?url=',
+            'jsonp': 'https://jsonp.afeld.me/?url='
+        };
 
-            bindEvents() {
-                this.newTabBtn.addEventListener('click', () => this.createTab());
-                this.backBtn.addEventListener('click', () => this.goBack());
-                this.forwardBtn.addEventListener('click', () => this.goForward());
-                this.refreshBtn.addEventListener('click', () => this.refresh());
-                
-                this.addressBar.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        this.navigate(this.addressBar.value.trim());
-                    }
-                });
+        // Initialize the browser
+        function initBrowser() {
+            tabs.push({
+                id: 0,
+                url: '',
+                title: 'New Tab',
+                history: [],
+                historyIndex: -1
+            });
 
-                this.menuBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.menuDropdown.classList.toggle('show');
-                });
+            // Load settings from localStorage
+            loadSettings();
 
-                document.addEventListener('click', (e) => {
-                    if (!this.menuBtn.contains(e.target)) {
-                        this.menuDropdown.classList.remove('show');
-                    }
-                });
-            }
-
-            createTab(url = null) {
-                const tabId = `tab-${++this.tabCounter}`;
-                const tab = {
-                    id: tabId,
-                    title: 'New Tab',
-                    url: url || '',
-                    history: [],
-                    historyIndex: -1,
-                    loading: false
-                };
-
-                this.tabs.push(tab);
-                this.renderTab(tab);
-                this.createTabContent(tab);
-                this.setActiveTab(tabId);
-
-                if (url) {
-                    this.loadUrl(url, tabId);
+            // Event listeners
+            document.getElementById('urlBar').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    navigateToUrl();
                 }
+            });
 
-                return tabId;
-            }
+            document.getElementById('backBtn').addEventListener('click', goBack);
+            document.getElementById('forwardBtn').addEventListener('click', goForward);
+            document.getElementById('refreshBtn').addEventListener('click', refresh);
+            document.getElementById('homeBtn').addEventListener('click', goHome);
 
-            renderTab(tab) {
-                const tabElement = document.createElement('div');
-                tabElement.className = 'tab';
-                tabElement.dataset.tabId = tab.id;
-                
-                tabElement.innerHTML = `
-                    <div class="tab-favicon"></div>
-                    <div class="tab-title">${tab.title}</div>
-                    <button class="tab-close">×</button>
-                `;
+            updateStatus('Ready to browse');
+        }
 
-                tabElement.addEventListener('click', (e) => {
-                    if (!e.target.classList.contains('tab-close')) {
-                        this.setActiveTab(tab.id);
-                    }
-                });
+        function navigateToUrl() {
+            const urlInput = document.getElementById('urlBar').value.trim();
+            if (!urlInput) return;
 
-                tabElement.querySelector('.tab-close').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.closeTab(tab.id);
-                });
-
-                this.tabsContainer.appendChild(tabElement);
-            }
-
-            createTabContent(tab) {
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'tab-content';
-                contentDiv.dataset.tabId = tab.id;
-                
-                if (!tab.url) {
-                    contentDiv.innerHTML = this.getStartPageHTML();
+            let url = urlInput;
+            
+            // Add protocol if missing
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                if (url.includes('.') && !url.includes(' ')) {
+                    url = 'https://' + url;
                 } else {
-                    contentDiv.innerHTML = `
-                        <div class="loading-bar"></div>
-                        <iframe class="content-frame" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
-                    `;
-                }
-
-                this.contentArea.appendChild(contentDiv);
-            }
-
-            getStartPageHTML() {
-                return `
-                    <div class="start-page">
-                        <h1>Secure Browser</h1>
-                        <p>Browse the web privately with built-in proxy support and security features.</p>
-                        <div class="quick-access">
-                            <div class="quick-link" onclick="browser.navigate('https://www.google.com')">
-                                <div class="quick-link-icon">🔍</div>
-                                <div class="quick-link-title">Google</div>
-                                <div class="quick-link-desc">Search</div>
-                            </div>
-                            <div class="quick-link" onclick="browser.navigate('https://github.com')">
-                                <div class="quick-link-icon">💻</div>
-                                <div class="quick-link-title">GitHub</div>
-                                <div class="quick-link-desc">Code</div>
-                            </div>
-                            <div class="quick-link" onclick="browser.navigate('https://news.ycombinator.com')">
-                                <div class="quick-link-icon">📰</div>
-                                <div class="quick-link-title">Hacker News</div>
-                                <div class="quick-link-desc">Tech News</div>
-                            </div>
-                            <div class="quick-link" onclick="browser.navigate('https://www.wikipedia.org')">
-                                <div class="quick-link-icon">📖</div>
-                                <div class="quick-link-title">Wikipedia</div>
-                                <div class="quick-link-desc">Knowledge</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            setActiveTab(tabId) {
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                document.querySelector(`[data-tab-id="${tabId}"]`).classList.add('active');
-
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.querySelector(`.tab-content[data-tab-id="${tabId}"]`).classList.add('active');
-
-                this.activeTabId = tabId;
-                const tab = this.tabs.find(t => t.id === tabId);
-                this.addressBar.value = tab.url;
-                this.updateNavigationButtons();
-            }
-
-            closeTab(tabId) {
-                if (this.tabs.length === 1) {
-                    this.createTab();
-                }
-
-                const tabIndex = this.tabs.findIndex(t => t.id === tabId);
-                this.tabs.splice(tabIndex, 1);
-
-                document.querySelector(`[data-tab-id="${tabId}"]`).remove();
-                document.querySelector(`.tab-content[data-tab-id="${tabId}"]`).remove();
-
-                if (this.activeTabId === tabId) {
-                    const nextTab = this.tabs[Math.min(tabIndex, this.tabs.length - 1)];
-                    this.setActiveTab(nextTab.id);
+                    url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
                 }
             }
 
-            navigate(input) {
-                if (!input) return;
+            loadUrl(url);
+        }
 
-                let url = input;
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                    if (url.includes('.') && !url.includes(' ')) {
-                        url = 'https://' + url;
-                    } else {
-                        url = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
-                    }
+        function loadUrl(url) {
+            const activeTab = getActiveTab();
+            if (!activeTab) return;
+
+            updateStatus('Loading...');
+            showLoading(true);
+
+            const proxyType = document.getElementById('proxySelector').value;
+            let proxyUrl = url;
+
+            // Apply proxy if selected
+            if (proxyType !== 'direct' && proxyConfigs[proxyType]) {
+                if (proxyType === 'allorigins') {
+                    proxyUrl = proxyConfigs[proxyType] + encodeURIComponent(url);
+                } else {
+                    proxyUrl = proxyConfigs[proxyType] + url;
                 }
-
-                this.loadUrl(url);
             }
 
-            async loadUrl(url, tabId = this.activeTabId) {
-                const tab = this.tabs.find(t => t.id === tabId);
-                if (!tab) return;
-
-                tab.url = url;
-                tab.loading = true;
-
-                if (tab.historyIndex === -1 || tab.history[tab.historyIndex] !== url) {
-                    tab.history = tab.history.slice(0, tab.historyIndex + 1);
-                    tab.history.push(url);
-                    tab.historyIndex = tab.history.length - 1;
-                }
-
-                this.addressBar.value = url;
-                this.updateTabTitle(tab, url);
-                this.statusText.textContent = `Loading ${new URL(url).hostname}...`;
-
-                const contentDiv = document.querySelector(`.tab-content[data-tab-id="${tabId}"]`);
-                const loadingBar = contentDiv.querySelector('.loading-bar');
+            // Create or update iframe
+            let iframe = document.querySelector(`#tab-content-${activeTab.id} iframe`);
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.className = 'browser-frame';
+                iframe.sandbox = 'allow-same-origin allow-scripts allow-popups allow-forms allow-downloads';
                 
-                if (loadingBar) {
-                    loadingBar.style.width = '50%';
-                }
-
-                try {
-                    const content = await this.fetchContent(url);
-                    this.displayContent(content, contentDiv, url);
-                    tab.loading = false;
-                    
-                    if (loadingBar) {
-                        loadingBar.style.width = '100%';
-                        setTimeout(() => loadingBar.style.width = '0%', 300);
-                    }
-                    
-                    this.statusText.textContent = `Loaded ${new URL(url).hostname}`;
-                } catch (error) {
-                    this.showError(contentDiv, url, error);
-                    tab.loading = false;
-                    if (loadingBar) loadingBar.style.width = '0%';
-                    this.statusText.textContent = `Failed to load ${new URL(url).hostname}`;
-                }
-
-                this.updateNavigationButtons();
+                const tabContent = document.getElementById(`tab-content-${activeTab.id}`);
+                tabContent.innerHTML = '';
+                tabContent.appendChild(iframe);
             }
 
-            async fetchContent(url) {
-                // Try different proxy methods
-                const methods = [
-                    () => this.fetchWithAllOrigins(url),
-                    () => this.fetchWithCorsAnywhere(url),
-                    () => this.fetchWithThingProxy(url),
-                    () => this.fetchDirect(url)
-                ];
-
-                for (const method of methods) {
-                    try {
-                        const result = await method();
-                        if (result) return result;
-                    } catch (error) {
-                        console.warn('Proxy method failed:', error);
-                        continue;
-                    }
-                }
-
-                throw new Error('All proxy methods failed');
-            }
-
-            async fetchWithAllOrigins(url) {
-                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
-                const data = await response.json();
-                return data.contents;
-            }
-
-            async fetchWithCorsAnywhere(url) {
-                const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
-                return await response.text();
-            }
-
-            async fetchWithThingProxy(url) {
-                const response = await fetch(`https://thingproxy.freeboard.io/fetch/${url}`);
-                return await response.text();
-            }
-
-            async fetchDirect(url) {
-                const response = await fetch(url, { mode: 'no-cors' });
-                return await response.text();
-            }
-
-            displayContent(html, contentDiv, originalUrl) {
-                // Create a sandboxed iframe and inject content
-                const iframe = contentDiv.querySelector('.content-frame');
-                if (iframe) {
-                    // Process HTML to make links absolute
-                    const processedHtml = this.processHtml(html, originalUrl);
-                    
-                    // Write content to iframe
-                    iframe.onload = () => {
-                        try {
-                            iframe.contentDocument.open();
-                            iframe.contentDocument.write(processedHtml);
-                            iframe.contentDocument.close();
-                        } catch (error) {
-                            console.warn('Could not write to iframe:', error);
+            // Handle different proxy types
+            if (proxyType === 'allorigins') {
+                fetch(proxyUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.contents) {
+                            const blob = new Blob([data.contents], { type: 'text/html' });
+                            iframe.src = URL.createObjectURL(blob);
                         }
-                    };
-                    
-                    // Set a blank src to initialize
-                    iframe.src = 'about:blank';
-                }
-            }
-
-            processHtml(html, baseUrl) {
-                try {
-                    const base = new URL(baseUrl);
-                    
-                    // Convert relative URLs to absolute
-                    html = html.replace(/href="\/([^"]*)"/g, `href="${base.origin}/$1"`);
-                    html = html.replace(/src="\/([^"]*)"/g, `src="${base.origin}/$1"`);
-                    html = html.replace(/href="(?!http)([^"]*)"/g, `href="${base.origin}/$1"`);
-                    html = html.replace(/src="(?!http)([^"]*)"/g, `src="${base.origin}/$1"`);
-                    
-                    // Add base tag
-                    if (!html.includes('<base')) {
-                        html = html.replace('<head>', `<head><base href="${baseUrl}">`);
-                    }
-                    
-                    return html;
-                } catch (error) {
-                    return html;
-                }
-            }
-
-            showError(contentDiv, url, error) {
-                contentDiv.innerHTML = `
-                    <div class="error-page">
-                        <h2>Unable to Load Page</h2>
-                        <p>Could not load <strong>${new URL(url).hostname}</strong></p>
-                        <p>This may be due to CORS restrictions or network issues.</p>
-                        <button class="retry-btn" onclick="browser.loadUrl('${url}')">
-                            Try Again
-                        </button>
-                    </div>
-                `;
-            }
-
-            updateTabTitle(tab, url) {
-                try {
-                    const domain = new URL(url).hostname.replace('www.', '');
-                    tab.title = domain;
-                } catch {
-                    tab.title = 'New Tab';
-                }
-
-                const tabElement = document.querySelector(`[data-tab-id="${tab.id}"] .tab-title`);
-                if (tabElement) {
-                    tabElement.textContent = tab.title;
-                }
-            }
-
-            goBack() {
-                const tab = this.tabs.find(t => t.id === this.activeTabId);
-                if (tab && tab.historyIndex > 0) {
-                    tab.historyIndex--;
-                    this.loadUrl(tab.history[tab.historyIndex]);
-                }
-            }
-
-            goForward() {
-                const tab = this.tabs.find(t => t.id === this.activeTabId);
-                if (tab && tab.historyIndex < tab.history.length - 1) {
-                    tab.historyIndex++;
-                    this.loadUrl(tab.history[tab.historyIndex]);
-                }
-            }
-
-            refresh() {
-                const tab = this.tabs.find(t => t.id === this.activeTabId);
-                if (tab && tab.url) {
-                    this.loadUrl(tab.url);
-                }
-            }
-
-            updateNavigationButtons() {
-                const tab = this.tabs.find(t => t.id === this.activeTabId);
-                this.backBtn.disabled = !tab || tab.historyIndex <= 0;
-                this.forwardBtn.disabled = !tab || tab.historyIndex >= tab.history.length - 1;
-            }
-
-            newTab() {
-                this.createTab();
-            }
-
-            clearData() {
-                // Clear all tab content
-                this.tabs.forEach(tab => {
-                    if (tab.url) {
-                        const contentDiv = document.querySelector(`.tab-content[data-tab-id="${tab.id}"]`);
-                        const iframe = contentDiv.querySelector('.content-frame');
-                        if (iframe) {
-                            iframe.src = 'about:blank';
-                        }
-                    }
-                });
-                
-                this.statusText.textContent = 'Data cleared';
-                setTimeout(() => {
-                    this.statusText.textContent = 'Ready';
-                }, 2000);
-            }
-
-            exportData() {
-                const data = {
-                    tabs: this.tabs.map(tab => ({
-                        title: tab.title,
-                        url: tab.url,
-                        history: tab.history
-                    }))
+                        showLoading(false);
+                        updateStatus('Loaded via AllOrigins proxy');
+                    })
+                    .catch(error => {
+                        handleLoadError(iframe, url, error);
+                    });
+            } else {
+                iframe.onload = function() {
+                    showLoading(false);
+                    updateStatus(`Loaded: ${url}`);
                 };
 
-                const blob = new Blob([JSON.stringify(data, null, 2)], {
-                    type: 'application/json'
-                });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'browser-data.json';
-                a.click();
-                URL.revokeObjectURL(url);
+                iframe.onerror = function() {
+                    handleLoadError(iframe, url);
+                };
+
+                try {
+                    iframe.src = proxyUrl;
+                } catch (error) {
+                    handleLoadError(iframe, url, error);
+                }
+            }
+
+            // Update tab info
+            activeTab.url = url;
+            activeTab.title = extractDomain(url);
+            updateTabTitle(activeTab.id, activeTab.title);
+            document.getElementById('urlBar').value = url;
+
+            // Add to history
+            addToHistory(url);
+            saveSettings();
+        }
+
+        function handleLoadError(iframe, originalUrl, error) {
+            console.error('Load error:', error);
+            
+            // Fallback to direct loading
+            try {
+                iframe.src = originalUrl;
+                updateStatus('Fallback: Loading directly');
+            } catch (fallbackError) {
+                // Create a simple error page
+                const errorHtml = `
+                    <html>
+                        <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f5f5f5;">
+                            <h2>Unable to Load Page</h2>
+                            <p>The page <strong>${originalUrl}</strong> could not be loaded.</p>
+                            <p>This might be due to CORS restrictions or network connectivity issues.</p>
+                            <button onclick="window.parent.goHome()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                Go Home
+                            </button>
+                        </body>
+                    </html>
+                `;
+                const blob = new Blob([errorHtml], { type: 'text/html' });
+                iframe.src = URL.createObjectURL(blob);
+                updateStatus('Error: Unable to load page');
+            }
+            
+            showLoading(false);
+        }
+
+        function createNewTab() {
+            const newTabId = tabCounter++;
+            
+            tabs.push({
+                id: newTabId,
+                url: '',
+                title: 'New Tab',
+                history: [],
+                historyIndex: -1
+            });
+
+            // Create tab UI
+            const tabsContainer = document.querySelector('.browser-tabs');
+            const newTabBtn = tabsContainer.querySelector('.new-tab-btn');
+            
+            const tabElement = document.createElement('div');
+            tabElement.className = 'tab';
+            tabElement.setAttribute('data-tab-id', newTabId);
+            tabElement.innerHTML = `
+                <span class="tab-title">New Tab</span>
+                <button class="tab-close" onclick="closeTab(${newTabId})">×</button>
+            `;
+            
+            tabElement.addEventListener('click', () => switchTab(newTabId));
+            tabsContainer.insertBefore(tabElement, newTabBtn);
+
+            // Create content container
+            const contentArea = document.querySelector('.browser-content');
+            const tabContent = document.createElement('div');
+            tabContent.id = `tab-content-${newTabId}`;
+            tabContent.className = 'tab-content';
+            tabContent.innerHTML = `
+                <div class="start-screen">
+                    <h1>New Tab</h1>
+                    <p>Enter a URL in the address bar to start browsing.</p>
+                </div>
+            `;
+            contentArea.appendChild(tabContent);
+
+            switchTab(newTabId);
+        }
+
+        function closeTab(tabId) {
+            if (tabs.length <= 1) return; // Keep at least one tab
+
+            // Remove from tabs array
+            tabs = tabs.filter(tab => tab.id !== tabId);
+
+            // Remove UI elements
+            document.querySelector(`[data-tab-id="${tabId}"]`).remove();
+            document.getElementById(`tab-content-${tabId}`).remove();
+
+            // Switch to first available tab if current was closed
+            if (activeTabId === tabId) {
+                switchTab(tabs[0].id);
             }
         }
 
-        const browser = new SecureBrowser();
+        function switchTab(tabId) {
+            // Update active states
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('data-tab-id') == tabId);
+            });
+
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === `tab-content-${tabId}`);
+            });
+
+            activeTabId = tabId;
+            const activeTab = getActiveTab();
+            
+            if (activeTab && activeTab.url) {
+                document.getElementById('urlBar').value = activeTab.url;
+            } else {
+                document.getElementById('urlBar').value = '';
+            }
+        }
+
+        function updateTabTitle(tabId, title) {
+            const tabElement = document.querySelector(`[data-tab-id="${tabId}"] .tab-title`);
+            if (tabElement) {
+                tabElement.textContent = title.substring(0, 20) + (title.length > 20 ? '...' : '');
+            }
+        }
+
+        function getActiveTab() {
+            return tabs.find(tab => tab.id === activeTabId);
+        }
+
+        function goBack() {
+            const activeTab = getActiveTab();
+            if (activeTab && activeTab.historyIndex > 0) {
+                activeTab.historyIndex--;
+                const url = activeTab.history[activeTab.historyIndex];
+                loadUrl(url);
+            }
+        }
+
+        function goForward() {
+            const activeTab = getActiveTab();
+            if (activeTab && activeTab.historyIndex < activeTab.history.length - 1) {
+                activeTab.historyIndex++;
+                const url = activeTab.history[activeTab.historyIndex];
+                loadUrl(url);
+            }
+        }
+
+        function refresh() {
+            const activeTab = getActiveTab();
+            if (activeTab && activeTab.url) {
+                loadUrl(activeTab.url);
+            }
+        }
+
+        function goHome() {
+            const activeTab = getActiveTab();
+            const tabContent = document.getElementById(`tab-content-${activeTab.id}`);
+            
+            tabContent.innerHTML = `
+                <div class="start-screen">
+                    <h1>Secure Anonymous Browser</h1>
+                    <p>Browse the web privately and securely. All activity stays local to your device with no external logging or tracking.</p>
+                    
+                    <div class="quick-links">
+                        <button class="quick-link" onclick="loadUrl('https://www.google.com')">
+                            <h3>Google</h3>
+                            <p>Search Engine</p>
+                        </button>
+                        <button class="quick-link" onclick="loadUrl('https://www.youtube.com')">
+                            <h3>YouTube</h3>
+                            <p>Video Platform</p>
+                        </button>
+                        <button class="quick-link" onclick="loadUrl('https://www.github.com')">
+                            <h3>GitHub</h3>
+                            <p>Code Repository</p>
+                        </button>
+                        <button class="quick-link" onclick="loadUrl('https://www.wikipedia.org')">
+                            <h3>Wikipedia</h3>
+                            <p>Free Encyclopedia</p>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            activeTab.url = '';
+            activeTab.title = 'New Tab';
+            document.getElementById('urlBar').value = '';
+            updateTabTitle(activeTab.id, 'New Tab');
+            updateStatus('Home');
+        }
+
+        function addToHistory(url) {
+            const activeTab = getActiveTab();
+            if (activeTab) {
+                activeTab.history.push(url);
+                activeTab.historyIndex = activeTab.history.length - 1;
+                
+                // Limit history size
+                if (activeTab.history.length > 100) {
+                    activeTab.history = activeTab.history.slice(-50);
+                    activeTab.historyIndex = activeTab.history.length - 1;
+                }
+            }
+        }
+
+        function showLoading(show) {
+            const activeTab = getActiveTab();
+            const tabContent = document.getElementById(`tab-content-${activeTab.id}`);
+            
+            if (show) {
+                if (!tabContent.querySelector('.loading-overlay')) {
+                    const overlay = document.createElement('div');
+                    overlay.className = 'loading-overlay';
+                    overlay.innerHTML = '<div class="loading-spinner"></div>';
+                    tabContent.appendChild(overlay);
+                }
+            } else {
+                const overlay = tabContent.querySelector('.loading-overlay');
+                if (overlay) {
+                    overlay.remove();
+                }
+            }
+        }
+
+        function updateStatus(text) {
+            document.getElementById('statusText').textContent = text;
+        }
+
+        function extractDomain(url) {
+            try {
+                return new URL(url).hostname || url;
+            } catch {
+                return url.substring(0, 30);
+            }
+        }
+
+        function saveSettings() {
+            const settings = {
+                tabs: tabs.map(tab => ({
+                    id: tab.id,
+                    url: tab.url,
+                    title: tab.title
+                })),
+                activeTabId: activeTabId,
+                proxy: document.getElementById('proxySelector').value
+            };
+            
+            try {
+                localStorage.setItem('browserSettings', JSON.stringify(settings));
+            } catch (e) {
+                console.warn('Unable to save settings:', e);
+            }
+        }
+
+        function loadSettings() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('browserSettings') || '{}');
+                
+                if (settings.proxy) {
+                    document.getElementById('proxySelector').value = settings.proxy;
+                }
+            } catch (e) {
+                console.warn('Unable to load settings:', e);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initBrowser);
+
+        // Save settings before unload
+        window.addEventListener('beforeunload', saveSettings);
     </script>
 </body>
 </html>
