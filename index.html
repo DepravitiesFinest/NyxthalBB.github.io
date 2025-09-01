@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Browser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .browser {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #2d2d2d;
+        }
+
+        .tabs-container {
+            background: #1e1e1e;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            min-height: 40px;
+        }
+
+        .tabs {
+            display: flex;
+            flex: 1;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            padding: 8px 16px;
+            min-width: 200px;
+            max-width: 240px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            margin-right: 2px;
+        }
+
+        .tab:hover {
+            background: #383838;
+        }
+
+        .tab.active {
+            background: #404040;
+            border-color: #606060;
+        }
+
+        .tab-favicon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border-radius: 2px;
+            background: #666;
+            flex-shrink: 0;
+        }
+
+        .tab-title {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        .tab.active .tab-title {
+            color: #fff;
+        }
+
+        .tab-close {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-close:hover {
+            background: #ff5f5f;
+            color: white;
+        }
+
+        .new-tab-btn {
+            background: transparent;
+            border: none;
+            color: #ccc;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            margin-left: 8px;
+        }
+
+        .new-tab-btn:hover {
+            background: #404040;
+            color: #fff;
+        }
+
+        .toolbar {
+            background: #2d2d2d;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #404040;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #404040;
+            color: #fff;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .address-bar {
+            flex: 1;
+            background: #1e1e1e;
+            border: 1px solid #404040;
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .address-bar:focus {
+            border-color: #0066cc;
+            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+        }
+
+        .controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .control-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn:hover {
+            background: #404040;
+            color: #fff;
+        }
+
+        .content-area {
+            flex: 1;
+            position: relative;
+            background: #1a1a1a;
+        }
+
+        .tab-content {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .tab-content.active {
+            opacity: 1;
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .sandbox-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+        }
+
+        .loading-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #0066cc, #0080ff);
+            width: 0%;
+            transition: width 0.3s ease;
+            z-index: 10;
+        }
+
+        .start-page {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            text-align: center;
+            padding: 40px;
+        }
+
+        .start-page h1 {
+            font-size: 2.2em;
+            font-weight: 300;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .start-page p {
+            font-size: 1em;
+            color: #aaa;
+            margin-bottom: 40px;
+            max-width: 500px;
+            line-height: 1.5;
+        }
+
+        .quick-access {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .quick-link {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .quick-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .quick-link-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .quick-link-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .quick-link-desc {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .status-bar {
+            background: #1e1e1e;
+            border-top: 1px solid #404040;
+            padding: 6px 16px;
+            font-size: 11px;
+            color: #999;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            min-width: 200px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            color: #ccc;
+            font-size: 13px;
+            border-bottom: 1px solid #404040;
+        }
+
+        .dropdown-item:hover {
+            background: #404040;
+            color: #fff;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .toolbar {
+                padding: 8px 12px;
+                gap: 8px;
+            }
+            
+            .tab {
+                min-width: 120px;
+                max-width: 160px;
+                padding: 6px 12px;
+            }
+            
+            .quick-access {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            .start-page {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="browser">
+        <div class="tabs-container">
+            <div class="tabs" id="tabs"></div>
+            <button class="new-tab-btn" id="newTabBtn" title="New Tab">+</button>
+        </div>
+
+        <div class="toolbar">
+            <div class="nav-controls">
+                <button class="nav-btn" id="backBtn" title="Back">←</button>
+                <button class="nav-btn" id="forwardBtn" title="Forward">→</button>
+                <button class="nav-btn" id="refreshBtn" title="Refresh">↻</button>
+            </div>
+            
+            <input type="text" class="address-bar" id="addressBar" placeholder="Search or enter address">
+            
+            <div class="controls">
+                <div style="position: relative;">
+                    <button class="control-btn" id="menuBtn" title="Menu">⋮</button>
+                    <div class="dropdown" id="menuDropdown">
+                        <div class="dropdown-item" onclick="browser.newTab()">New Tab</div>
+                        <div class="dropdown-item" onclick="browser.clearData()">Clear Data</div>
+                        <div class="dropdown-item" onclick="browser.toggleProxy()">
+                            <span id="proxyToggleText">Enable Proxy</span>
+                        </div>
+                        <div class="dropdown-item" onclick="browser.exportData()">Export Data</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area" id="contentArea"></div>
+
+        <div class="status-bar">
+            <span id="statusText">Ready</span>
+            <span>Secure • Private • Local</span>
+        </div>
+    </div>
+
+    <script>
+        class SecureBrowser {
+            constructor() {
+                this.tabs = [];
+                this.activeTabId = null;
+                this.tabCounter = 0;
+                this.history = new Map();
+                this.proxyMode = localStorage.getItem('proxy_mode') === 'true';
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.createTab();
+                this.updateProxyToggle();
+            }
+
+            initializeElements() {
+                this.tabsContainer = document.getElementById('tabs');
+                this.contentArea = document.getElementById('contentArea');
+                this.addressBar = document.getElementById('addressBar');
+                this.backBtn = document.getElementById('backBtn');
+                this.forwardBtn = document.getElementById('forwardBtn');
+                this.refreshBtn = document.getElementById('refreshBtn');
+                this.newTabBtn = document.getElementById('newTabBtn');
+                this.menuBtn = document.getElementById('menuBtn');
+                this.menuDropdown = document.getElementById('menuDropdown');
+                this.statusText = document.getElementById('statusText');
+            }
+
+            bindEvents() {
+                this.newTabBtn.addEventListener('click', () => this.createTab());
+                this.backBtn.addEventListener('click', () => this.goBack());
+                this.forwardBtn.addEventListener('click', () => this.goForward());
+                this.refreshBtn.addEventListener('click', () => this.refresh());
+                
+                this.addressBar.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.navigate(this.addressBar.value.trim());
+                    }
+                });
+
+                this.menuBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.menuDropdown.classList.toggle('show');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!this.menuBtn.contains(e.target)) {
+                        this.menuDropdown.classList.remove('show');
+                    }
+                });
+            }
+
+            createTab(url = null) {
+                const tabId = `tab-${++this.tabCounter}`;
+                const tab = {
+                    id: tabId,
+                    title: 'New Tab',
+                    url: url || '',
+                    history: [],
+                    historyIndex: -1,
+                    loading: false
+                };
+
+                this.tabs.push(tab);
+                this.renderTab(tab);
+                this.createTabContent(tab);
+                this.setActiveTab(tabId);
+
+                if (url) {
+                    this.loadUrl(url, tabId);
+                }
+
+                return tabId;
+            }
+
+            renderTab(tab) {
+                const tabElement = document.createElement('div');
+                tabElement.className = 'tab';
+                tabElement.dataset.tabId = tab.id;
+                
+                tabElement.innerHTML = `
+                    <div class="tab-favicon"></div>
+                    <div class="tab-title">${tab.title}</div>
+                    <button class="tab-close">×</button>
+                `;
+
+                tabElement.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('tab-close')) {
+                        this.setActiveTab(tab.id);
+                    }
+                });
+
+                tabElement.querySelector('.tab-close').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.closeTab(tab.id);
+                });
+
+                this.tabsContainer.appendChild(tabElement);
+            }
+
+            createTabContent(tab) {
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'tab-content';
+                contentDiv.dataset.tabId = tab.id;
+                
+                if (!tab.url) {
+                    contentDiv.innerHTML = this.getStartPageHTML();
+                } else {
+                    contentDiv.innerHTML = `
+                        <div class="iframe-container">
+                            <div class="loading-bar"></div>
+                        </div>
+                    `;
+                }
+
+                this.contentArea.appendChild(contentDiv);
+            }
+
+            getStartPageHTML() {
+                return `
+                    <div class="start-page">
+                        <h1>Secure Browser</h1>
+                        <p>Browse the web privately with built-in sandboxing and security features.</p>
+                        <div class="quick-access">
+                            <div class="quick-link" onclick="browser.navigate('https://www.google.com')">
+                                <div class="quick-link-icon">🔍</div>
+                                <div class="quick-link-title">Google</div>
+                                <div class="quick-link-desc">Search</div>
+                            </div>
+                            <div class="quick-link" onclick="browser.navigate('https://github.com')">
+                                <div class="quick-link-icon">💻</div>
+                                <div class="quick-link-title">GitHub</div>
+                                <div class="quick-link-desc">Code</div>
+                            </div>
+                            <div class="quick-link" onclick="browser.navigate('https://news.ycombinator.com')">
+                                <div class="quick-link-icon">📰</div>
+                                <div class="quick-link-title">Hacker News</div>
+                                <div class="quick-link-desc">Tech News</div>
+                            </div>
+                            <div class="quick-link" onclick="browser.navigate('https://www.wikipedia.org')">
+                                <div class="quick-link-icon">📖</div>
+                                <div class="quick-link-title">Wikipedia</div>
+                                <div class="quick-link-desc">Knowledge</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            setActiveTab(tabId) {
+                // Update tab appearance
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelector(`[data-tab-id="${tabId}"]`).classList.add('active');
+
+                // Update content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.querySelector(`.tab-content[data-tab-id="${tabId}"]`).classList.add('active');
+
+                this.activeTabId = tabId;
+                const tab = this.tabs.find(t => t.id === tabId);
+                this.addressBar.value = tab.url;
+                this.updateNavigationButtons();
+            }
+
+            closeTab(tabId) {
+                if (this.tabs.length === 1) {
+                    this.createTab();
+                }
+
+                const tabIndex = this.tabs.findIndex(t => t.id === tabId);
+                this.tabs.splice(tabIndex, 1);
+
+                document.querySelector(`[data-tab-id="${tabId}"]`).remove();
+                document.querySelector(`.tab-content[data-tab-id="${tabId}"]`).remove();
+
+                if (this.activeTabId === tabId) {
+                    const nextTab = this.tabs[Math.min(tabIndex, this.tabs.length - 1)];
+                    this.setActiveTab(nextTab.id);
+                }
+            }
+
+            navigate(input) {
+                if (!input) return;
+
+                let url = input;
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    if (url.includes('.') && !url.includes(' ')) {
+                        url = 'https://' + url;
+                    } else {
+                        url = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
+                    }
+                }
+
+                this.loadUrl(url);
+            }
+
+            loadUrl(url, tabId = this.activeTabId) {
+                const tab = this.tabs.find(t => t.id === tabId);
+                if (!tab) return;
+
+                tab.url = url;
+                tab.loading = true;
+
+                // Update history
+                if (tab.historyIndex === -1 || tab.history[tab.historyIndex] !== url) {
+                    tab.history = tab.history.slice(0, tab.historyIndex + 1);
+                    tab.history.push(url);
+                    tab.historyIndex = tab.history.length - 1;
+                }
+
+                // Update UI
+                this.addressBar.value = url;
+                this.updateTabTitle(tab, url);
+                this.statusText.textContent = `Loading ${new URL(url).hostname}...`;
+
+                const contentDiv = document.querySelector(`.tab-content[data-tab-id="${tabId}"]`);
+                const loadingBar = contentDiv.querySelector('.loading-bar');
+                
+                if (loadingBar) {
+                    loadingBar.style.width = '70%';
+                }
+
+                // Create iframe
+                const iframe = document.createElement('iframe');
+                iframe.className = 'sandbox-frame';
+                iframe.src = this.proxyMode ? this.getProxyUrl(url) : url;
+                iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-presentation');
+
+                iframe.onload = () => {
+                    tab.loading = false;
+                    if (loadingBar) {
+                        loadingBar.style.width = '100%';
+                        setTimeout(() => {
+                            loadingBar.style.width = '0%';
+                        }, 200);
+                    }
+                    this.statusText.textContent = `Loaded ${new URL(url).hostname}`;
+                };
+
+                iframe.onerror = () => {
+                    tab.loading = false;
+                    this.statusText.textContent = `Failed to load ${new URL(url).hostname}`;
+                };
+
+                const container = contentDiv.querySelector('.iframe-container');
+                if (container) {
+                    const existingIframe = container.querySelector('iframe');
+                    if (existingIframe) {
+                        container.removeChild(existingIframe);
+                    }
+                    container.appendChild(iframe);
+                } else {
+                    contentDiv.innerHTML = `
+                        <div class="iframe-container">
+                            <div class="loading-bar" style="width: 70%;"></div>
+                        </div>
+                    `;
+                    contentDiv.querySelector('.iframe-container').appendChild(iframe);
+                }
+
+                this.updateNavigationButtons();
+            }
+
+            updateTabTitle(tab, url) {
+                try {
+                    const domain = new URL(url).hostname.replace('www.', '');
+                    tab.title = domain;
+                } catch {
+                    tab.title = 'New Tab';
+                }
+
+                const tabElement = document.querySelector(`[data-tab-id="${tab.id}"] .tab-title`);
+                if (tabElement) {
+                    tabElement.textContent = tab.title;
+                }
+            }
+
+            getProxyUrl(url) {
+                return `https://cors-anywhere.herokuapp.com/${url}`;
+            }
+
+            goBack() {
+                const tab = this.tabs.find(t => t.id === this.activeTabId);
+                if (tab && tab.historyIndex > 0) {
+                    tab.historyIndex--;
+                    this.loadUrl(tab.history[tab.historyIndex]);
+                }
+            }
+
+            goForward() {
+                const tab = this.tabs.find(t => t.id === this.activeTabId);
+                if (tab && tab.historyIndex < tab.history.length - 1) {
+                    tab.historyIndex++;
+                    this.loadUrl(tab.history[tab.historyIndex]);
+                }
+            }
+
+            refresh() {
+                const tab = this.tabs.find(t => t.id === this.activeTabId);
+                if (tab && tab.url) {
+                    this.loadUrl(tab.url);
+                }
+            }
+
+            updateNavigationButtons() {
+                const tab = this.tabs.find(t => t.id === this.activeTabId);
+                this.backBtn.disabled = !tab || tab.historyIndex <= 0;
+                this.forwardBtn.disabled = !tab || tab.historyIndex >= tab.history.length - 1;
+            }
+
+            newTab() {
+                this.createTab();
+            }
+
+            clearData() {
+                localStorage.clear();
+                this.statusText.textContent = 'Data cleared';
+                setTimeout(() => {
+                    this.statusText.textContent = 'Ready';
+                }, 2000);
+            }
+
+            toggleProxy() {
+                this.proxyMode = !this.proxyMode;
+                localStorage.setItem('proxy_mode', this.proxyMode.toString());
+                this.updateProxyToggle();
+            }
+
+            updateProxyToggle() {
+                document.getElementById('proxyToggleText').textContent = 
+                    this.proxyMode ? 'Disable Proxy' : 'Enable Proxy';
+            }
+
+            exportData() {
+                const data = {
+                    tabs: this.tabs.map(tab => ({
+                        title: tab.title,
+                        url: tab.url,
+                        history: tab.history
+                    })),
+                    settings: {
+                        proxyMode: this.proxyMode
+                    }
+                };
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], {
+                    type: 'application/json'
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'browser-data.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        const browser = new SecureBrowser();
+    </script>
+</body>
+</html>
