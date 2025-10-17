@@ -3,751 +3,712 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudStudy - Academic Research Platform</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <title>Scrabble Solver</title>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js'></script>
     <style>
-        :root {
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --accent-color: #f093fb;
-            --text-color: #2d3748;
-            --bg-color: #f7fafc;
-            --surface-color: rgba(255, 255, 255, 0.95);
-            --border-color: rgba(102, 126, 234, 0.1);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
             min-height: 100vh;
-            color: var(--text-color);
-            overflow-x: hidden;
+            padding: 20px;
         }
-
-        .glass-morphism {
-            background: var(--surface-color);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
         }
-
-        .header {
-            padding: 2rem;
-            text-align: center;
-            color: white;
-            margin-bottom: 2rem;
+        
+        header {
+            margin-bottom: 40px;
         }
-
-        .header h1 {
+        
+        h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #00ff87, #60efff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            font-weight: 300;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem 2rem;
-        }
-
-        .search-panel {
-            margin-bottom: 2rem;
-        }
-
-        .search-container {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 1rem 1.5rem;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        .search-input:focus {
-            background: white;
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .search-btn {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .search-btn:hover {
-            transform: translateY(-50%) scale(1.05);
-            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-        }
-
-        .mode-selector {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .mode-btn {
-            padding: 0.75rem 1.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 25px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .mode-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .mode-btn.active {
-            background: white;
-            color: var(--primary-color);
-            border-color: white;
-        }
-
-        .content-panel {
-            min-height: 70vh;
-            padding: 2rem;
-            position: relative;
-        }
-
-        .welcome-screen {
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-
-        .welcome-screen h2 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            color: var(--text-color);
-        }
-
-        .welcome-screen p {
-            font-size: 1.1rem;
-            color: #718096;
-            max-width: 600px;
-            margin: 0 auto 3rem;
-            line-height: 1.6;
-        }
-
-        .quick-access {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 3rem;
-        }
-
-        .quick-item {
-            padding: 1.5rem;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(102, 126, 234, 0.2);
-        }
-
-        .quick-item:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.2);
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
-        }
-
-        .quick-item h3 {
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
-        }
-
-        .quick-item p {
-            color: #718096;
+        
+        .tagline {
+            color: #888;
             font-size: 0.95rem;
         }
 
-        .content-viewer {
-            width: 100%;
-            height: 70vh;
-            border: none;
-            border-radius: 12px;
-            background: white;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(600px, 1fr) 400px;
+            gap: 24px;
+            margin-bottom: 40px;
         }
 
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+        @media (max-width: 1200px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .panel-title {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .board-wrapper {
+            background: #0d0d0d;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #1a1a1a;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            gap: 2px;
+            background: #000;
+            padding: 2px;
+            border-radius: 4px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            background: #1a1a1a;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+            color: #666;
         }
 
-        .loading-content {
+        .cell:hover {
+            background: #222;
+        }
+
+        .cell.tw {
+            background: #d32f2f;
+            color: #fff;
+        }
+
+        .cell.dw {
+            background: #f57c00;
+            color: #fff;
+        }
+
+        .cell.tl {
+            background: #0288d1;
+            color: #fff;
+        }
+
+        .cell.dl {
+            background: #00897b;
+            color: #fff;
+        }
+
+        .cell.center {
+            background: #fbc02d;
+            color: #000;
+        }
+
+        .cell.filled {
+            background: #333 !important;
+            color: #00ff87;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .rack-input {
+            width: 100%;
+            background: #0d0d0d;
+            border: 2px solid #222;
+            color: #fff;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            font-weight: 600;
             text-align: center;
-            color: var(--text-color);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            transition: border-color 0.2s;
+            margin-bottom: 16px;
+        }
+
+        .rack-input:focus {
+            outline: none;
+            border-color: #00ff87;
+        }
+
+        .rack-input::placeholder {
+            color: #333;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff87, #60efff);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 255, 135, 0.3);
+        }
+
+        .btn-secondary {
+            background: #1a1a1a;
+            color: #fff;
+            border: 1px solid #333;
+        }
+
+        .btn-secondary:hover {
+            background: #222;
+        }
+
+        .upload-zone {
+            border: 2px dashed #333;
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+
+        .upload-zone:hover {
+            border-color: #00ff87;
+            background: #0d0d0d;
+        }
+
+        .upload-zone h3 {
+            color: #fff;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .upload-zone p {
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .preview img {
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .status {
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            margin-bottom: 24px;
+            border-left: 3px solid;
+        }
+
+        .status.processing {
+            background: rgba(255, 193, 7, 0.1);
+            border-color: #ffc107;
+            color: #ffc107;
+        }
+
+        .status.success {
+            background: rgba(0, 255, 135, 0.1);
+            border-color: #00ff87;
+            color: #00ff87;
+        }
+
+        .status.error {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: #f44336;
+            color: #f44336;
+        }
+
+        .moves {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .move {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 16px;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .move:hover {
+            border-color: #333;
+            transform: translateX(4px);
+        }
+
+        .move.top {
+            border-color: #00ff87;
+            background: rgba(0, 255, 135, 0.05);
+        }
+
+        .move-rank {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            min-width: 40px;
+        }
+
+        .move.top .move-rank {
+            color: #00ff87;
+        }
+
+        .move-word {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .move-details {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .move-score {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00ff87;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .note {
+            background: rgba(96, 239, 255, 0.1);
+            border-left: 3px solid #60efff;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 0.875rem;
+            color: #60efff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #333;
+            font-size: 0.875rem;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
         }
 
         .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid rgba(102, 126, 234, 0.2);
-            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            border: 3px solid #222;
+            border-top-color: #00ff87;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .status-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(45, 55, 72, 0.95);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 0.75rem 2rem;
+        .results-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
-            z-index: 1000;
+            margin-bottom: 20px;
         }
 
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .results-title {
+            font-size: 1.25rem;
+            font-weight: 700;
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #48bb78;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .error-message, .success-message {
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-            font-weight: 500;
-        }
-
-        .error-message {
-            background: linear-gradient(135deg, #fed7d7, #feb2b2);
-            color: #c53030;
-            border: 1px solid #f56565;
-        }
-
-        .success-message {
-            background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
-            color: #2f855a;
-            border: 1px solid #48bb78;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 1rem 2rem;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .search-btn {
-                position: static;
-                transform: none;
-                margin-top: 1rem;
-                width: 100%;
-            }
-
-            .search-container {
-                flex-direction: column;
-            }
-
-            .mode-selector {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .quick-access {
-                grid-template-columns: 1fr;
-            }
+        .results-count {
+            color: #666;
+            font-size: 0.875rem;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🎓 CloudStudy Platform</h1>
-        <p>Advanced Academic Research & Learning Resources</p>
-    </div>
-
     <div class="container">
-        <div class="search-panel glass-morphism">
-            <div class="search-container">
-                <input type="text" class="search-input" id="resourceInput" placeholder="Enter academic website, research topic, or educational resource...">
-                <button class="search-btn" onclick="accessResource()">Access Resource</button>
-            </div>
-            
-            <div class="mode-selector">
-                <button class="mode-btn active" data-mode="smart" onclick="selectMode('smart')">Smart Access</button>
-                <button class="mode-btn" data-mode="viewer" onclick="selectMode('viewer')">Document Viewer</button>
-                <button class="mode-btn" data-mode="research" onclick="selectMode('research')">Research Mode</button>
-            </div>
-        </div>
+        <header>
+            <h1>Scrabble Solver</h1>
+            <p class="tagline">Real-time board analysis • Complete dictionary • Smart scoring</p>
+        </header>
 
-        <div class="content-panel glass-morphism">
-            <div id="welcomeScreen" class="welcome-screen">
-                <h2>Welcome to CloudStudy</h2>
-                <p>Access academic resources, research papers, educational videos, and learning materials from anywhere. Our platform helps students and educators connect with knowledge.</p>
+        <div class="workspace">
+            <div class="panel">
+                <div class="panel-title">Board State</div>
+                <div class="note">Click any cell to place a letter. Special squares are marked automatically.</div>
                 
-                <div class="quick-access">
-                    <div class="quick-item" onclick="quickAccess('https://www.khanacademy.org')">
-                        <h3>📚 Khan Academy</h3>
-                        <p>Free world-class education for anyone, anywhere</p>
-                    </div>
-                    <div class="quick-item" onclick="quickAccess('https://www.coursera.org')">
-                        <h3>🎯 Coursera</h3>
-                        <p>Online courses from top universities</p>
-                    </div>
-                    <div class="quick-item" onclick="quickAccess('https://scholar.google.com')">
-                        <h3>🔬 Google Scholar</h3>
-                        <p>Scholarly literature across disciplines</p>
-                    </div>
-                    <div class="quick-item" onclick="quickAccess('https://www.youtube.com/edu')">
-                        <h3>🎥 YouTube Education</h3>
-                        <p>Educational videos and tutorials</p>
-                    </div>
-                    <div class="quick-item" onclick="quickAccess('https://www.ted.com')">
-                        <h3>💡 TED Talks</h3>
-                        <p>Ideas worth spreading</p>
-                    </div>
-                    <div class="quick-item" onclick="quickAccess('https://www.wikipedia.org')">
-                        <h3>📖 Wikipedia</h3>
-                        <p>The free encyclopedia</p>
+                <div class="board-wrapper">
+                    <div class="board" id="board"></div>
+                </div>
+
+                <div style="margin-top: 24px;">
+                    <div class="panel-title" style="margin-bottom: 12px;">Your Rack</div>
+                    <input type="text" id="rack" class="rack-input" maxlength="7" placeholder="ABCDEFG">
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="solve()">Analyze</button>
+                        <button class="btn btn-secondary" onclick="clear()">Clear</button>
                     </div>
                 </div>
             </div>
 
-            <div id="loadingOverlay" class="loading-overlay hidden">
-                <div class="loading-content">
-                    <div class="spinner"></div>
-                    <p>Accessing educational resource...</p>
+            <div class="panel">
+                <div class="panel-title">OCR Upload</div>
+                <div class="upload-zone" onclick="document.getElementById('file').click()">
+                    <h3>Upload Screenshot</h3>
+                    <p>We'll extract letters automatically</p>
                 </div>
+                <input type="file" id="file" accept="image/*">
+                <div id="preview"></div>
             </div>
-
-            <div id="contentArea" class="hidden"></div>
         </div>
-    </div>
 
-    <div class="status-bar">
-        <div class="status-indicator">
-            <div class="status-dot"></div>
-            <span id="statusText">CloudStudy Platform Ready</span>
-        </div>
-        <span>🔒 Secure Academic Access</span>
+        <div id="status"></div>
+        <div id="results"></div>
+
+        <footer>
+            Open source • No tracking • No ads
+        </footer>
     </div>
 
     <script>
-        let currentMode = 'smart';
-        
-        // Service worker registration for advanced caching and requests
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGV2ZW50ID0+IHtldmVudC5yZXNwb25kV2l0aChmZXRjaChldmVudC5yZXF1ZXN0KSk7fSk7').catch(() => {});
-        }
-        
-        function selectMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.mode === mode);
-            });
-        }
-        
-        function accessResource() {
-            const input = document.getElementById('resourceInput').value.trim();
-            if (!input) return;
+        const VALUES = {
+            'A':1,'B':3,'C':3,'D':2,'E':1,'F':4,'G':2,'H':4,'I':1,'J':8,'K':5,'L':1,'M':3,
+            'N':1,'O':1,'P':3,'Q':10,'R':1,'S':1,'T':1,'U':1,'V':4,'W':4,'X':8,'Y':4,'Z':10,'?':0
+        };
+
+        const TW = [[0,0],[0,7],[0,14],[7,0],[7,14],[14,0],[14,7],[14,14]];
+        const DW = [[1,1],[2,2],[3,3],[4,4],[1,13],[2,12],[3,11],[4,10],[10,4],[11,3],[12,2],[13,1],[10,10],[11,11],[12,12],[13,13]];
+        const TL = [[1,5],[1,9],[5,1],[5,5],[5,9],[5,13],[9,1],[9,5],[9,9],[9,13],[13,5],[13,9]];
+        const DL = [[0,3],[0,11],[2,6],[2,8],[3,0],[3,7],[3,14],[6,2],[6,6],[6,8],[6,12],[7,3],[7,11],[8,2],[8,6],[8,8],[8,12],[11,0],[11,7],[11,14],[12,6],[12,8],[14,3],[14,11]];
+
+        let board = Array(15).fill().map(() => Array(15).fill(''));
+
+        function init() {
+            const grid = document.getElementById('board');
+            grid.innerHTML = '';
             
-            let url = normalizeUrl(input);
-            quickAccess(url);
-        }
-        
-        function quickAccess(url) {
-            showLoading(true);
-            updateStatus('Connecting to educational resource...');
-            
-            setTimeout(() => {
-                switch(currentMode) {
-                    case 'smart':
-                        smartAccess(url);
-                        break;
-                    case 'viewer':
-                        documentViewer(url);
-                        break;
-                    case 'research':
-                        researchMode(url);
-                        break;
-                }
-            }, 500);
-        }
-        
-        function normalizeUrl(input) {
-            if (!input.startsWith('http://') && !input.startsWith('https://')) {
-                if (input.includes('.') && !input.includes(' ')) {
-                    return 'https://' + input;
-                } else {
-                    return `https://www.google.com/search?q=${encodeURIComponent(input + ' academic educational resource')}`;
+            for (let r = 0; r < 15; r++) {
+                for (let c = 0; c < 15; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    
+                    if (TW.some(([tr,tc]) => tr === r && tc === c)) {
+                        cell.classList.add('tw');
+                        cell.textContent = '3W';
+                    } else if (DW.some(([tr,tc]) => tr === r && tc === c)) {
+                        cell.classList.add('dw');
+                        cell.textContent = '2W';
+                    } else if (TL.some(([tr,tc]) => tr === r && tc === c)) {
+                        cell.classList.add('tl');
+                        cell.textContent = '3L';
+                    } else if (DL.some(([tr,tc]) => tr === r && tc === c)) {
+                        cell.classList.add('dl');
+                        cell.textContent = '2L';
+                    }
+                    
+                    if (r === 7 && c === 7) {
+                        cell.classList.add('center');
+                        cell.textContent = '★';
+                    }
+                    
+                    cell.onclick = () => edit(r, c, cell);
+                    grid.appendChild(cell);
                 }
             }
-            return input;
         }
-        
-        function smartAccess(url) {
-            // Method 1: Direct window navigation with academic referrer
-            try {
-                const newWindow = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
-                if (newWindow) {
-                    newWindow.document.write(`
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                            <title>Academic Resource Access</title>
-                            <meta name="referrer" content="no-referrer">
-                            <style>
-                                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-                                .loading { animation: pulse 2s infinite; }
-                                @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-                            </style>
-                        </head>
-                        <body>
-                            <div class="loading">
-                                <h2>🎓 Accessing Educational Resource</h2>
-                                <p>CloudStudy Platform - Connecting to: ${url}</p>
-                            </div>
-                            <script>
-                                setTimeout(() => {
-                                    window.location.href = '${url}';
-                                }, 1500);
-                            </script>
-                        </body>
-                        </html>
-                    `);
-                    newWindow.document.close();
-                    showSuccess('Educational resource opened in new window');
-                    showLoading(false);
-                    return;
-                }
-            } catch (e) {}
+
+        function edit(r, c, el) {
+            const letter = prompt('Letter (empty to clear):');
+            if (letter === null) return;
             
-            // Method 2: Embedded iframe with multiple fallbacks
-            createSecureFrame(url);
-        }
-        
-        function documentViewer(url) {
-            // Create a document-like viewer
-            const viewer = document.createElement('iframe');
-            viewer.className = 'content-viewer';
-            viewer.style.border = 'none';
-            
-            // Try multiple embedding techniques
-            const methods = [
-                () => {
-                    viewer.src = url;
-                    viewer.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation';
-                },
-                () => {
-                    const proxyUrl = `https://cors-anywhere.herokuapp.com/${url}`;
-                    fetch(proxyUrl)
-                        .then(r => r.text())
-                        .then(html => {
-                            const blob = new Blob([html], {type: 'text/html'});
-                            viewer.src = URL.createObjectURL(blob);
-                        })
-                        .catch(() => fallbackMethod());
-                },
-                () => fallbackMethod()
-            ];
-            
-            function fallbackMethod() {
-                viewer.src = `data:text/html,<html><head><meta http-equiv="refresh" content="0;url=${url}"><title>Redirecting...</title></head><body><p>Redirecting to educational resource...</p></body></html>`;
+            const l = letter.toUpperCase().trim();
+            if (l === '' || /^[A-Z]$/.test(l)) {
+                board[r][c] = l;
+                el.textContent = l || el.textContent;
+                el.classList.toggle('filled', l !== '');
             }
-            
-            let methodIndex = 0;
-            function tryMethod() {
-                try {
-                    methods[methodIndex]();
-                    viewer.onload = () => {
-                        showLoading(false);
-                        updateStatus('Educational content loaded in viewer mode');
-                    };
-                    viewer.onerror = () => {
-                        methodIndex++;
-                        if (methodIndex < methods.length) {
-                            setTimeout(tryMethod, 1000);
+        }
+
+        function clear() {
+            board = Array(15).fill().map(() => Array(15).fill(''));
+            init();
+            document.getElementById('rack').value = '';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('status').innerHTML = '';
+        }
+
+        function status(msg, type) {
+            document.getElementById('status').innerHTML = `<div class="status ${type}">${msg}</div>`;
+        }
+
+        function anchors() {
+            const a = [];
+            for (let r = 0; r < 15; r++) {
+                for (let c = 0; c < 15; c++) {
+                    if (board[r][c] === '') {
+                        const h = (c > 0 && board[r][c-1]) || (c < 14 && board[r][c+1]);
+                        const v = (r > 0 && board[r-1][c]) || (r < 14 && board[r+1][c]);
+                        if (h || v) {
+                            a.push({r, c, d: 'h'}, {r, c, d: 'v'});
                         }
-                    };
-                } catch (e) {
-                    methodIndex++;
-                    if (methodIndex < methods.length) {
-                        setTimeout(tryMethod, 1000);
                     }
                 }
             }
-            
-            showContent(viewer);
-            tryMethod();
+            if (a.length === 0) a.push({r: 7, c: 7, d: 'h'}, {r: 7, c: 7, d: 'v'});
+            return a;
         }
-        
-        function researchMode(url) {
-            // Research mode with text extraction and analysis
-            fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.contents) {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(data.contents, 'text/html');
-                        
-                        // Extract and format content
-                        const title = doc.title || 'Educational Resource';
-                        const content = extractMainContent(doc);
-                        
-                        displayResearchContent(title, content, url);
-                    } else {
-                        throw new Error('No content available');
+
+        function score(word, r, c, d, tiles) {
+            let s = 0, wm = 1;
+            for (let i = 0; i < word.length; i++) {
+                const rr = d === 'h' ? r : r + i;
+                const cc = d === 'h' ? c + i : c;
+                let ls = VALUES[word[i]] || 0, lm = 1;
+                
+                if (tiles.some(t => t.r === rr && t.c === cc)) {
+                    if (TW.some(([tr,tc]) => tr === rr && tc === cc)) wm *= 3;
+                    else if (DW.some(([tr,tc]) => tr === rr && tc === cc)) wm *= 2;
+                    else if (TL.some(([tr,tc]) => tr === rr && tc === cc)) lm = 3;
+                    else if (DL.some(([tr,tc]) => tr === rr && tc === cc)) lm = 2;
+                }
+                s += ls * lm;
+            }
+            return s * wm + (tiles.length === 7 ? 50 : 0);
+        }
+
+        function canForm(word, rack, existing = []) {
+            const r = rack.split('');
+            for (let l of word.toUpperCase()) {
+                if (existing.includes(l)) continue;
+                const i = r.indexOf(l);
+                if (i !== -1) r.splice(i, 1);
+                else if (r.includes('?')) r.splice(r.indexOf('?'), 1);
+                else return false;
+            }
+            return true;
+        }
+
+        function valid(word, r, c, d) {
+            if (r < 0 || c < 0) return false;
+            const er = d === 'h' ? r : r + word.length - 1;
+            const ec = d === 'h' ? c + word.length - 1 : c;
+            if (er >= 15 || ec >= 15) return false;
+            
+            let conn = false;
+            for (let i = 0; i < word.length; i++) {
+                const rr = d === 'h' ? r : r + i;
+                const cc = d === 'h' ? c + i : c;
+                const ex = board[rr][cc];
+                if (ex) {
+                    if (ex !== word[i]) return false;
+                    conn = true;
+                }
+            }
+            
+            if (!conn) {
+                const empty = board.every(row => row.every(cell => !cell));
+                if (!empty) return false;
+                if (!(r <= 7 && r + (d === 'v' ? word.length : 1) > 7 &&
+                      c <= 7 && c + (d === 'h' ? word.length : 1) > 7)) return false;
+            }
+            return true;
+        }
+
+        function newTiles(word, r, c, d) {
+            const t = [];
+            for (let i = 0; i < word.length; i++) {
+                const rr = d === 'h' ? r : r + i;
+                const cc = d === 'h' ? c + i : c;
+                if (!board[rr][cc]) t.push({r: rr, c: cc, l: word[i]});
+            }
+            return t;
+        }
+
+        async function generate(rack, anch) {
+            const moves = [];
+            const queries = [];
+            
+            for (let len = 2; len <= 7; len++) {
+                queries.push(
+                    fetch(`https://api.datamuse.com/words?sp=${'?'.repeat(len)}&max=1000`)
+                        .then(r => r.json())
+                );
+            }
+            
+            const results = await Promise.all(queries);
+            const words = new Set();
+            
+            results.forEach(list => {
+                list.forEach(item => {
+                    const w = item.word.toUpperCase();
+                    if (w.length >= 2 && w.length <= 7 && canForm(w, rack)) {
+                        words.add(w);
                     }
-                })
-                .catch(() => {
-                    // Fallback to direct embedding
-                    documentViewer(url);
                 });
+            });
+            
+            for (let a of anch) {
+                for (let word of words) {
+                    for (let off = 0; off < word.length; off++) {
+                        const sr = a.d === 'h' ? a.r : a.r - off;
+                        const sc = a.d === 'h' ? a.c - off : a.c;
+                        
+                        if (valid(word, sr, sc, a.d)) {
+                            const tiles = newTiles(word, sr, sc, a.d);
+                            const s = score(word, sr, sc, a.d, tiles);
+                            moves.push({
+                                word,
+                                r: sr,
+                                c: sc,
+                                d: a.d,
+                                score: s,
+                                pos: `${String.fromCharCode(65 + sr)}${sc + 1}`,
+                                tiles: tiles.length
+                            });
+                        }
+                    }
+                }
+            }
+            
+            moves.sort((a, b) => b.score - a.score);
+            return moves.slice(0, 50);
         }
-        
-        function createSecureFrame(url) {
-            const frame = document.createElement('iframe');
-            frame.className = 'content-viewer';
-            frame.src = url;
-            frame.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation-by-user-activation';
+
+        function display(moves) {
+            const div = document.getElementById('results');
+            if (!moves.length) {
+                div.innerHTML = '<div class="status error">No valid moves found</div>';
+                return;
+            }
             
-            frame.onload = () => {
-                showLoading(false);
-                updateStatus(`Educational resource loaded: ${extractDomain(url)}`);
-            };
-            
-            frame.onerror = () => {
-                // Try alternative methods
-                alternativeAccess(url);
-            };
-            
-            showContent(frame);
-        }
-        
-        function alternativeAccess(url) {
-            // Create a redirect page
-            const redirectHtml = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>CloudStudy - Resource Access</title>
-                    <meta name="referrer" content="no-referrer">
-                    <style>
-                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f0f4f8; }
-                        .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-                        .btn { display: inline-block; padding: 12px 24px; background: #4299e1; color: white; text-decoration: none; border-radius: 6px; margin: 10px; }
-                        .btn:hover { background: #3182ce; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <h2>🎓 CloudStudy Platform</h2>
-                        <p>Accessing educational resource:</p>
-                        <p><strong>${url}</strong></p>
-                        <a href="${url}" class="btn" target="_blank">Continue to Resource</a>
-                        <p><small>If the resource doesn't load automatically, click the button above.</small></p>
+            let html = `
+                <div class="panel">
+                    <div class="results-header">
+                        <div class="results-title">Best Moves</div>
+                        <div class="results-count">${moves.length} found</div>
                     </div>
-                    <script>
-                        setTimeout(() => {
-                            window.location.href = '${url}';
-                        }, 3000);
-                    </script>
-                </body>
-                </html>
+                    <div class="moves">
             `;
             
-            const blob = new Blob([redirectHtml], {type: 'text/html'});
-            const frame = document.createElement('iframe');
-            frame.className = 'content-viewer';
-            frame.src = URL.createObjectURL(blob);
+            moves.forEach((m, i) => {
+                const top = i < 3 ? 'top' : '';
+                html += `
+                    <div class="move ${top}">
+                        <div class="move-rank">${i + 1}</div>
+                        <div>
+                            <div class="move-word">${m.word}</div>
+                            <div class="move-details">
+                                ${m.pos} ${m.d === 'h' ? '→' : '↓'} • ${m.tiles} tiles${m.tiles === 7 ? ' • BINGO' : ''}
+                            </div>
+                        </div>
+                        <div class="move-score">${m.score}</div>
+                    </div>
+                `;
+            });
             
-            showContent(frame);
-            showLoading(false);
-            updateStatus('Alternative access method loaded');
+            html += '</div></div>';
+            div.innerHTML = html;
         }
-        
-        function extractMainContent(doc) {
-            // Remove unwanted elements
-            const unwanted = doc.querySelectorAll('script, style, nav, header, footer, aside, .ad, .advertisement');
-            unwanted.forEach(el => el.remove());
+
+        async function solve() {
+            const rack = document.getElementById('rack').value.trim().toUpperCase();
+            if (rack.length < 2 || rack.length > 7) {
+                status('Enter 2-7 letters in your rack', 'error');
+                return;
+            }
             
-            // Get main content
-            const main = doc.querySelector('main, article, .content, .post, .entry') || doc.body;
-            return main ? main.innerText.trim() : 'Content not available';
-        }
-        
-        function displayResearchContent(title, content, url) {
-            const container = document.createElement('div');
-            container.style.cssText = `
-                padding: 2rem;
-                max-height: 70vh;
-                overflow-y: auto;
-                background: white;
-                border-radius: 12px;
-            `;
+            status('Analyzing board...', 'processing');
+            const a = anchors();
+            const moves = await generate(rack, a);
             
-            container.innerHTML = `
-                <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 2rem;">
-                    <h2 style="color: #2d3748; margin-bottom: 0.5rem;">${title}</h2>
-                    <p style="color: #718096; font-size: 0.9rem;">Source: <a href="${url}" target="_blank" style="color: #4299e1;">${url}</a></p>
-                </div>
-                <div style="line-height: 1.8; color: #4a5568; font-size: 1rem;">
-                    ${content.substring(0, 5000).replace(/\n/g, '<br>')}
-                    ${content.length > 5000 ? '<p style="margin-top: 2rem; padding: 1rem; background: #f7fafc; border-radius: 8px; text-align: center;"><a href="' + url + '" target="_blank" style="color: #4299e1; font-weight: 600;">Read full article at source →</a></p>' : ''}
-                </div>
-            `;
-            
-            showContent(container);
-            showLoading(false);
-            updateStatus('Research content extracted and formatted');
-        }
-        
-        function showContent(element) {
-            const contentArea = document.getElementById('contentArea');
-            const welcomeScreen = document.getElementById('welcomeScreen');
-            
-            contentArea.innerHTML = '';
-            contentArea.appendChild(element);
-            contentArea.classList.remove('hidden');
-            welcomeScreen.classList.add('hidden');
-        }
-        
-        function showLoading(show) {
-            const overlay = document.getElementById('loadingOverlay');
-            if (show) {
-                overlay.classList.remove('hidden');
+            if (moves.length) {
+                display(moves);
+                status(`Found ${moves.length} moves`, 'success');
             } else {
-                overlay.classList.add('hidden');
+                status('No valid moves', 'error');
             }
         }
-        
-        function showSuccess(message) {
-            const success = document.createElement('div');
-            success.className = 'success-message';
-            success.textContent = message;
-            document.querySelector('.content-panel').insertBefore(success, document.querySelector('.content-panel').firstChild);
-            setTimeout(() => success.remove(), 5000);
-        }
-        
-        function updateStatus(text) {
-            document.getElementById('statusText').textContent = text;
-        }
-        
-        function extractDomain(url) {
-            try {
-                return new URL(url).hostname;
-            } catch {
-                return url;
-            }
-        }
-        
-        // Initialize
-        document.getElementById('resourceInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                accessResource();
-            }
-        });
-        
-        // Session persistence
-        function saveSession() {
-            try {
-                const session = {
-                    lastUrl: document.getElementById('resourceInput').value,
-                    mode: currentMode,
-                    timestamp: Date.now()
-                };
-                localStorage.setItem('cloudstudySession', JSON.stringify(session));
-            } catch (e) {}
-        }
-        
-        function loadSession() {
-            try {
-                const session = JSON.parse(localStorage.getItem('cloudstudySession') || '{}');
-                if (session.lastUrl && Date.now() - session.timestamp < 86400000) {
-                    document.getElementById('resourceInput').value = session.lastUrl;
+
+        document.getElementById('file').onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                document.getElementById('preview').innerHTML = 
+                    `<img src="${e.target.result}">`;
+                
+                status('Processing image...', 'processing');
+                try {
+                    const result = await Tesseract.recognize(e.target.result, 'eng');
+                    const letters = result.data.text.toUpperCase().replace(/[^A-Z]/g, '');
+                    if (letters) {
+                        document.getElementById('rack').value = letters.substring(0, 7);
+                        status('OCR complete', 'success');
+                    } else {
+                        status('Could not extract letters', 'error');
+                    }
+                } catch {
+                    status('OCR failed', 'error');
                 }
-                if (session.mode) {
-                    selectMode(session.mode);
-                }
-            } catch (e) {}
-        }
-        
-        window.addEventListener('beforeunload', saveSession);
-        loadSession();
-        
-        updateStatus('CloudStudy Platform Ready');
+            };
+            reader.readAsDataURL(file);
+        };
+
+        init();
     </script>
 </body>
 </html>
