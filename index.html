@@ -46,7 +46,7 @@
 
         .workspace {
             display: grid;
-            grid-template-columns: minmax(600px, 1fr) 400px;
+            grid-template-columns: minmax(650px, 1fr) 450px;
             gap: 24px;
             margin-bottom: 40px;
         }
@@ -78,6 +78,32 @@
             padding: 16px;
             border-radius: 8px;
             border: 1px solid #1a1a1a;
+            position: relative;
+        }
+
+        .board-coords {
+            display: flex;
+            justify-content: space-around;
+            color: #333;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            padding-left: 18px;
+        }
+
+        .board-row-wrapper {
+            display: flex;
+            gap: 4px;
+        }
+
+        .board-row-label {
+            width: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 0.7rem;
+            font-weight: 600;
         }
 
         .board {
@@ -87,8 +113,7 @@
             background: #000;
             padding: 2px;
             border-radius: 4px;
-            max-width: 600px;
-            margin: 0 auto;
+            flex: 1;
         }
 
         .cell {
@@ -97,7 +122,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.15s;
@@ -107,38 +132,34 @@
 
         .cell:hover {
             background: #222;
+            transform: scale(1.05);
+            z-index: 10;
         }
 
-        .cell.tw {
-            background: #d32f2f;
-            color: #fff;
-        }
-
-        .cell.dw {
-            background: #f57c00;
-            color: #fff;
-        }
-
-        .cell.tl {
-            background: #0288d1;
-            color: #fff;
-        }
-
-        .cell.dl {
-            background: #00897b;
-            color: #fff;
-        }
-
-        .cell.center {
-            background: #fbc02d;
-            color: #000;
-        }
+        .cell.tw { background: #d32f2f; color: #fff; }
+        .cell.dw { background: #f57c00; color: #fff; }
+        .cell.tl { background: #0288d1; color: #fff; }
+        .cell.dl { background: #00897b; color: #fff; }
+        .cell.center { background: #fbc02d; color: #000; }
 
         .cell.filled {
             background: #333 !important;
-            color: #00ff87;
-            font-size: 1rem;
+            color: #fff;
+            font-size: 1.1rem;
             font-weight: 700;
+        }
+
+        .cell.preview {
+            background: #00ff87 !important;
+            color: #000;
+            font-size: 1.1rem;
+            font-weight: 700;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         .rack-input {
@@ -268,6 +289,22 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .moves::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .moves::-webkit-scrollbar-track {
+            background: #0d0d0d;
+            border-radius: 4px;
+        }
+
+        .moves::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
         }
 
         .move {
@@ -280,16 +317,17 @@
             gap: 16px;
             align-items: center;
             transition: all 0.2s;
+            cursor: pointer;
         }
 
         .move:hover {
-            border-color: #333;
+            border-color: #00ff87;
             transform: translateX(4px);
         }
 
-        .move.top {
+        .move.active {
             border-color: #00ff87;
-            background: rgba(0, 255, 135, 0.05);
+            background: rgba(0, 255, 135, 0.1);
         }
 
         .move-rank {
@@ -299,7 +337,7 @@
             min-width: 40px;
         }
 
-        .move.top .move-rank {
+        .move.active .move-rank {
             color: #00ff87;
         }
 
@@ -376,6 +414,34 @@
             color: #666;
             font-size: 0.875rem;
         }
+
+        .legend {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-box.existing {
+            background: #333;
+        }
+
+        .legend-box.new {
+            background: #00ff87;
+        }
     </style>
 </head>
 <body>
@@ -388,10 +454,24 @@
         <div class="workspace">
             <div class="panel">
                 <div class="panel-title">Board State</div>
-                <div class="note">Click any cell to place a letter. Special squares are marked automatically.</div>
+                <div class="note">Click cells to enter existing letters. Top move will be highlighted automatically.</div>
                 
                 <div class="board-wrapper">
-                    <div class="board" id="board"></div>
+                    <div class="board-coords">
+                        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+                    </div>
+                    <div id="board-container"></div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-box existing"></div>
+                        <span>Existing tiles</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box new"></div>
+                        <span>Suggested move</span>
+                    </div>
                 </div>
 
                 <div style="margin-top: 24px;">
@@ -405,18 +485,13 @@
             </div>
 
             <div class="panel">
-                <div class="panel-title">OCR Upload</div>
-                <div class="upload-zone" onclick="document.getElementById('file').click()">
-                    <h3>Upload Screenshot</h3>
-                    <p>We'll extract letters automatically</p>
-                </div>
-                <input type="file" id="file" accept="image/*">
-                <div id="preview"></div>
+                <div class="panel-title">Best Moves</div>
+                <div class="note">Click any move to preview it on the board</div>
+                <div id="results"></div>
             </div>
         </div>
 
         <div id="status"></div>
-        <div id="results"></div>
 
         <footer>
             Open source • No tracking • No ads
@@ -435,15 +510,32 @@
         const DL = [[0,3],[0,11],[2,6],[2,8],[3,0],[3,7],[3,14],[6,2],[6,6],[6,8],[6,12],[7,3],[7,11],[8,2],[8,6],[8,8],[8,12],[11,0],[11,7],[11,14],[12,6],[12,8],[14,3],[14,11]];
 
         let board = Array(15).fill().map(() => Array(15).fill(''));
+        let cells = [];
+        let currentMoves = [];
+        let activeMove = null;
 
         function init() {
-            const grid = document.getElementById('board');
-            grid.innerHTML = '';
+            const container = document.getElementById('board-container');
+            container.innerHTML = '';
+            cells = [];
             
             for (let r = 0; r < 15; r++) {
+                const rowWrapper = document.createElement('div');
+                rowWrapper.className = 'board-row-wrapper';
+                
+                const label = document.createElement('div');
+                label.className = 'board-row-label';
+                label.textContent = String.fromCharCode(65 + r);
+                rowWrapper.appendChild(label);
+                
+                const rowGrid = document.createElement('div');
+                rowGrid.className = 'board';
+                
                 for (let c = 0; c < 15; c++) {
                     const cell = document.createElement('div');
                     cell.className = 'cell';
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
                     
                     if (TW.some(([tr,tc]) => tr === r && tc === c)) {
                         cell.classList.add('tw');
@@ -465,8 +557,13 @@
                     }
                     
                     cell.onclick = () => edit(r, c, cell);
-                    grid.appendChild(cell);
+                    rowGrid.appendChild(cell);
+                    if (!cells[r]) cells[r] = [];
+                    cells[r][c] = cell;
                 }
+                
+                rowWrapper.appendChild(rowGrid);
+                container.appendChild(rowWrapper);
             }
         }
 
@@ -477,13 +574,57 @@
             const l = letter.toUpperCase().trim();
             if (l === '' || /^[A-Z]$/.test(l)) {
                 board[r][c] = l;
-                el.textContent = l || el.textContent;
-                el.classList.toggle('filled', l !== '');
+                updateCell(r, c);
+            }
+        }
+
+        function updateCell(r, c) {
+            const cell = cells[r][c];
+            const letter = board[r][c];
+            
+            if (letter) {
+                cell.textContent = letter;
+                cell.classList.add('filled');
+                cell.classList.remove('preview');
+            } else {
+                // Restore original label
+                if (TW.some(([tr,tc]) => tr === r && tc === c)) cell.textContent = '3W';
+                else if (DW.some(([tr,tc]) => tr === r && tc === c)) cell.textContent = '2W';
+                else if (TL.some(([tr,tc]) => tr === r && tc === c)) cell.textContent = '3L';
+                else if (DL.some(([tr,tc]) => tr === r && tc === c)) cell.textContent = '2L';
+                else if (r === 7 && c === 7) cell.textContent = '★';
+                else cell.textContent = '';
+                
+                cell.classList.remove('filled', 'preview');
+            }
+        }
+
+        function previewMove(move) {
+            // Clear previous preview
+            for (let r = 0; r < 15; r++) {
+                for (let c = 0; c < 15; c++) {
+                    updateCell(r, c);
+                }
+            }
+            
+            if (!move) return;
+            
+            // Show new tiles as preview
+            for (let i = 0; i < move.word.length; i++) {
+                const r = move.d === 'h' ? move.r : move.r + i;
+                const c = move.d === 'h' ? move.c + i : move.c;
+                
+                if (!board[r][c]) {
+                    cells[r][c].textContent = move.word[i];
+                    cells[r][c].classList.add('preview');
+                }
             }
         }
 
         function clear() {
             board = Array(15).fill().map(() => Array(15).fill(''));
+            currentMoves = [];
+            activeMove = null;
             init();
             document.getElementById('rack').value = '';
             document.getElementById('results').innerHTML = '';
@@ -496,8 +637,11 @@
 
         function anchors() {
             const a = [];
+            let hasAny = false;
+            
             for (let r = 0; r < 15; r++) {
                 for (let c = 0; c < 15; c++) {
+                    if (board[r][c]) hasAny = true;
                     if (board[r][c] === '') {
                         const h = (c > 0 && board[r][c-1]) || (c < 14 && board[r][c+1]);
                         const v = (r > 0 && board[r-1][c]) || (r < 14 && board[r+1][c]);
@@ -507,7 +651,11 @@
                     }
                 }
             }
-            if (a.length === 0) a.push({r: 7, c: 7, d: 'h'}, {r: 7, c: 7, d: 'v'});
+            
+            if (!hasAny) {
+                a.push({r: 7, c: 7, d: 'h'}, {r: 7, c: 7, d: 'v'});
+            }
+            
             return a;
         }
 
@@ -529,12 +677,22 @@
             return s * wm + (tiles.length === 7 ? 50 : 0);
         }
 
-        function canForm(word, rack, existing = []) {
+        function canForm(word, rack) {
             const r = rack.split('');
-            for (let l of word.toUpperCase()) {
-                if (existing.includes(l)) continue;
-                const i = r.indexOf(l);
-                if (i !== -1) r.splice(i, 1);
+            const needed = [];
+            
+            for (let i = 0; i < word.length; i++) {
+                const rr = word.move ? (word.d === 'h' ? word.r : word.r + i) : 0;
+                const cc = word.move ? (word.d === 'h' ? word.c + i : word.c) : 0;
+                const l = word[i];
+                
+                if (word.move && board[rr] && board[rr][cc]) continue;
+                needed.push(l);
+            }
+            
+            for (let l of needed) {
+                const idx = r.indexOf(l);
+                if (idx !== -1) r.splice(idx, 1);
                 else if (r.includes('?')) r.splice(r.indexOf('?'), 1);
                 else return false;
             }
@@ -558,12 +716,14 @@
                 }
             }
             
-            if (!conn) {
-                const empty = board.every(row => row.every(cell => !cell));
-                if (!empty) return false;
+            const empty = board.every(row => row.every(cell => !cell));
+            if (!empty && !conn) return false;
+            
+            if (empty) {
                 if (!(r <= 7 && r + (d === 'v' ? word.length : 1) > 7 &&
                       c <= 7 && c + (d === 'h' ? word.length : 1) > 7)) return false;
             }
+            
             return true;
         }
 
@@ -594,7 +754,7 @@
             results.forEach(list => {
                 list.forEach(item => {
                     const w = item.word.toUpperCase();
-                    if (w.length >= 2 && w.length <= 7 && canForm(w, rack)) {
+                    if (w.length >= 2 && w.length <= 7) {
                         words.add(w);
                     }
                 });
@@ -608,16 +768,21 @@
                         
                         if (valid(word, sr, sc, a.d)) {
                             const tiles = newTiles(word, sr, sc, a.d);
-                            const s = score(word, sr, sc, a.d, tiles);
-                            moves.push({
-                                word,
-                                r: sr,
-                                c: sc,
-                                d: a.d,
-                                score: s,
-                                pos: `${String.fromCharCode(65 + sr)}${sc + 1}`,
-                                tiles: tiles.length
-                            });
+                            
+                            // Check if we can form this word with our rack
+                            const rackNeeded = tiles.map(t => t.l).join('');
+                            if (canForm(rackNeeded, rack)) {
+                                const s = score(word, sr, sc, a.d, tiles);
+                                moves.push({
+                                    word,
+                                    r: sr,
+                                    c: sc,
+                                    d: a.d,
+                                    score: s,
+                                    pos: `${String.fromCharCode(65 + sr)}${sc + 1}`,
+                                    tiles: tiles.length
+                                });
+                            }
                         }
                     }
                 }
@@ -634,19 +799,12 @@
                 return;
             }
             
-            let html = `
-                <div class="panel">
-                    <div class="results-header">
-                        <div class="results-title">Best Moves</div>
-                        <div class="results-count">${moves.length} found</div>
-                    </div>
-                    <div class="moves">
-            `;
+            currentMoves = moves;
+            let html = '<div class="moves">';
             
             moves.forEach((m, i) => {
-                const top = i < 3 ? 'top' : '';
                 html += `
-                    <div class="move ${top}">
+                    <div class="move ${i === 0 ? 'active' : ''}" onclick="selectMove(${i})">
                         <div class="move-rank">${i + 1}</div>
                         <div>
                             <div class="move-word">${m.word}</div>
@@ -659,8 +817,21 @@
                 `;
             });
             
-            html += '</div></div>';
+            html += '</div>';
             div.innerHTML = html;
+            
+            // Auto-preview top move
+            selectMove(0);
+        }
+
+        function selectMove(idx) {
+            activeMove = idx;
+            previewMove(currentMoves[idx]);
+            
+            // Update active state
+            document.querySelectorAll('.move').forEach((el, i) => {
+                el.classList.toggle('active', i === idx);
+            });
         }
 
         async function solve() {
@@ -681,32 +852,6 @@
                 status('No valid moves', 'error');
             }
         }
-
-        document.getElementById('file').onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                document.getElementById('preview').innerHTML = 
-                    `<img src="${e.target.result}">`;
-                
-                status('Processing image...', 'processing');
-                try {
-                    const result = await Tesseract.recognize(e.target.result, 'eng');
-                    const letters = result.data.text.toUpperCase().replace(/[^A-Z]/g, '');
-                    if (letters) {
-                        document.getElementById('rack').value = letters.substring(0, 7);
-                        status('OCR complete', 'success');
-                    } else {
-                        status('Could not extract letters', 'error');
-                    }
-                } catch {
-                    status('OCR failed', 'error');
-                }
-            };
-            reader.readAsDataURL(file);
-        };
 
         init();
     </script>
